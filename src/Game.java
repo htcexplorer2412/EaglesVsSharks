@@ -1,13 +1,11 @@
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import java.awt.event.*;
 
-public class Game extends JFrame {
+public class Game extends JFrame implements Observer {
 
 	/**
 	 * 
@@ -30,7 +28,7 @@ public class Game extends JFrame {
 	private int selectionCount = 0;
 	private int[] selectionIndex = new int[3];
 	private char selectionTeam = 'e';
-	private ImageIcon icon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+	
 	
 	public Game()
 	{
@@ -126,12 +124,12 @@ public class Game extends JFrame {
         //Adding main panel to the frame
         c.add(mainPanel);
         
-        board = new Board(this.cellPanel, this.mainPanel);
-        board.drawBoard();
-        board.arrangeIslands();
-        
         eagle = new Player('e');
         shark = new Player('s');
+        
+        board = new Board(this.cellPanel, this.mainPanel, this.eagle, this.shark, this);
+        board.drawBoard();
+        board.arrangeIslands();
 	}
 	
 	private void drawButtonPanel()
@@ -171,11 +169,18 @@ public class Game extends JFrame {
 		
 		diceButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		dice.rollDice();
-        		System.out.println(dice.getDiceVal());
-        		tf1.setText(dice.getDiceVal() + "");
-        		diceRolled = true;
-        		board.setDiceRolledValue(true);
+        		if(!diceRolled)
+        		{
+        			dice.rollDice();
+            		System.out.println(dice.getDiceVal());
+            		tf1.setText(dice.getDiceVal() + "");
+            		diceRolled = true;
+            		board.setDiceAndTurn(true, dice.getDiceVal());
+        		}
+        		else
+        		{
+        			System.out.println("Move not complete yet!");
+        		}
         	}
         });
 	}
@@ -303,8 +308,14 @@ public class Game extends JFrame {
         });
 	}
 	
-	public static void main(String[] args)
+	/*public static void main(String[] args)
 	{
-		Game game = new Game();
+		new Game();
+	}*/
+
+	@Override
+	public void update(boolean diceRolled) {
+		// TODO Auto-generated method stub
+		this.diceRolled = diceRolled;
 	}
 }

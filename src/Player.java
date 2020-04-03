@@ -139,4 +139,40 @@ public class Player {
 	{
 		return sNames;
 	}
+	
+	public boolean checkValidMove(JTextField name, int prevPointX, int prevPointY, int pointX, int pointY)
+	{
+		int index = 3;
+		
+		for(int i = 0; i < this.sNames.length; i++)
+		{
+			if(sNames[i].getText().toString().equals(name.getText().toString()))
+			{
+				index = i;
+				break;
+			}
+		}
+		
+		char orientation = piece[index].getMovementOrientation();
+		
+		if(orientation == '+')
+		{
+			//Sideways
+			if((Math.abs(pointX - prevPointX) > 0 && Math.abs(pointY - prevPointY) == 0) || (Math.abs(pointX - prevPointX) == 0 && Math.abs(pointY - prevPointY) > 0))
+				return true;
+			else
+				return false;
+		}
+		else if(orientation == 'x')
+		{
+			//Diagonal
+			if(Math.abs(pointX - prevPointX) == Math.abs(pointY - prevPointY))
+				return true;
+			else
+				return false;
+		}
+		else
+			return false;
+	}
+	
 }

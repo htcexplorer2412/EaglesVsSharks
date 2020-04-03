@@ -17,8 +17,8 @@ public class Tile extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private int xPos, yPos;
 	private JPanel cellPanel, mainPanel;
-	private boolean isPartOfIsland = false, diceRolled;
-	private char isClicked;														//n - not clicked, f - first click, s - second click
+	private boolean isPartOfIsland = false; //diceRolled;
+	//private char isClicked;														//n - not clicked, f - first click, s - second click
 	
 	public Tile(int x, int y, JPanel cellPanel, JPanel mainPanel)
 	{
@@ -26,8 +26,8 @@ public class Tile extends JPanel {
 		this.yPos = y;
 		this.cellPanel = cellPanel;
 		this.mainPanel = mainPanel;
-		this.diceRolled = false;
-		this.isClicked = 'n';			
+		//this.diceRolled = false;
+		//this.isClicked = 'n';			
 	}
 	
 	public JLabel getIcon()
@@ -74,10 +74,10 @@ public class Tile extends JPanel {
 		mainPanel.add(cellPanel);
 	}
 	
-	public void setDiceRolledValue(boolean value)
+	/*public void setDiceRolledValue(boolean value)
 	{
 		this.diceRolled = value;
-	}
+	}*/
 	
 	public void setAsPartOfIsland(String islandType, String tileType)
 	{

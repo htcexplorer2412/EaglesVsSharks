@@ -1,7 +1,3 @@
-import java.awt.TextField;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -13,30 +9,50 @@ public class Board {
 	private Island island1, island2, island3, island4, island5, island6;
 	private Tile[][] t;
 	private MouseAdapterParent map;
-	//private boolean diceRolled;
+	private boolean whosTurn;							//true for eagle, false for shark
+	//private Player eagle, shark;
 	
 	//private String[][] boardState = new String[][] {{"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}};
 	
-	public Board(JPanel[][] cellPanel, JPanel mainPanel)
+	public Board(JPanel[][] cellPanel, JPanel mainPanel, Player eagle, Player shark, Game game)
 	{
 		this.cellPanel = cellPanel;
 		this.mainPanel = mainPanel;
 		t = new Tile[cellPanel.length][cellPanel.length];
-		this.map = new MouseAdapterParent();
+		this.whosTurn = true;
+		this.map = new MouseAdapterParent(eagle, shark, game);
 		//this.diceRolled = false;
 	}
 	
-	public void setDiceRolledValue(boolean value)
+	public void setDiceAndTurn(boolean value)
 	{
-		for(int i = 0 ; i < t.length; i++)
+		map.setDiceRolledValue(value);
+		//map.setTurn(this.whosTurnItIs());
+	}
+	
+	public void setDiceAndTurn(boolean value, int dValue)
+	{
+		/*for(int i = 0 ; i < t.length; i++)
 		{
 			for(int j = 0; j < t.length; j++)
 			{
 				t[i][j].setDiceRolledValue(value);
 			}
-		}
+		}*/
 		
 		map.setDiceRolledValue(value);
+		//map.setTurn(this.whosTurnItIs());
+		map.setRolledValue(dValue);
+	}
+	
+	public boolean whosTurnItIs()
+	{
+		return whosTurn;
+	}
+	
+	public void changeTurn(boolean value)
+	{
+		this.whosTurn = value;
 	}
 	
 	public void drawBoard()
@@ -107,14 +123,11 @@ public class Board {
 	}
 	
 	public void arrangePieceInitial(char team, JLabel[] icon, JTextField[] name)
-	{
-		//JTextField tName = new JTextField();
-		
+	{		
 		if(team == 'e')
 		{
 			for(int i = 0; i < icon.length; i++)
 			{
-				//tName.setText(name[i]);
 				t[i + 5][11].putPieceOnTile(icon[i], name[i]);
 				System.out.println("Putting " + name[i].getText() + " on tile " + (i+5) + ",11");
 			}
@@ -123,41 +136,9 @@ public class Board {
 		{
 			for(int i = 0; i < icon.length; i++)
 			{
-				//tName.setText(name[i]);
 				t[i + 5][0].putPieceOnTile(icon[i], name[i]);
 				System.out.println("Putting " + name[i].getText() + " on tile " + (i+5) + ",0");
 			}
 		}
 	}
-
-	/*@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}*/
-	
 }
