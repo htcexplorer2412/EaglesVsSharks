@@ -1,0 +1,21 @@
+To run the code, download the folder. 
+Now run GameDriver.java in cmd or Eclipse. 
+A window with 3 options - 'New Game', 'Load Game' and 'Exit ' will popup.
+Click the 'New Game' button.
+Another window will popup with a Game board and a list of pieces
+Select a piece and click 'Select' button. Select 3 pieces for Eagle team and then click 'Next'.
+Do the same for Shark team.
+Now click on "Roll Dice' button. The textbox besides the button will show the value you rolled. 
+Move as many steps as shown in the textbox. You can try multiple pieces too. 
+The game is not yet complete, so the turn changing may be buggy.
+
+
+Things to be added
+Data regarding each piece.
+New icons.
+Line Of Sight attack options and related components like buttons, etc.
+Include island and obstacles related to that.
+Better dice animation
+Battle conditions and Battle UI
+Board redesign (animation and colour)
+Adding design patterns and defining design patterns currently used in this code.
