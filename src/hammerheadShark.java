@@ -1,5 +1,8 @@
 import javax.swing.ImageIcon;
 
+/*
+ * Image icon address will change
+ */
 public class hammerheadShark extends Piece {
 
 	public hammerheadShark()

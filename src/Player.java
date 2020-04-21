@@ -14,6 +14,8 @@ public class Player {
 	}
 	
 	//Take in 3 attacking piece from players. Let them select.
+	/*Add precondition that pieceIndex is not empty. 
+	At the end of execution, supplier guarantees that there will be an object generated for the piece selected, with icon and name related to that piece (Post condition)*/
 	public void selectPieces(int[] pieceIndex)
 	{
 		if(this.team == 'e')
@@ -112,7 +114,6 @@ public class Player {
 				}
 			}
 		}
-		
 	}
 	
 	public String[] getPieceNames()
@@ -140,6 +141,8 @@ public class Player {
 		return sNames;
 	}
 	
+	/*Precondition - X-Y coordinates should be between 0 and board's max size. Piece array should not be empty
+	At the end of execution, supplier guarantees that the result will sent out which will be either true or false (Post condition)*/
 	public boolean checkValidMove(JTextField name, int prevPointX, int prevPointY, int pointX, int pointY)
 	{
 		int index = 3;

@@ -48,16 +48,22 @@ public abstract class Piece {
 		return pieceAlive;
 	}
 	
+	/*Given that piece is in island (Pre condition)
+	Post condition - Defense attribute is updated*/
 	public void addToDefenseAttribute(int def)
 	{
 		defense = defense + def;
 	}
 	
+	/*Given that piece is in island (Pre condition)
+	Post condition - Defense attribute is updated*/
 	public void removeDefenseAdditions(int def)
 	{
 		defense = defense - def;
 	}
 	
+	/*Pre condition - Given that piece is not dead (Healthpoints > 0)
+	Post condition - Healthpoint attribute is updated and not exceed max healthpoints*/
 	public void addToHealthPoints(int addition)
 	{
 		int temp = healthPoints + addition;
@@ -72,6 +78,8 @@ public abstract class Piece {
 		}
 	}
 	
+	/*Pre condition - Given that piece is not dead (Healthpoints > 0)
+	Post condition - Piece health is updated and/or piece is confirmed dead*/
 	public void reduceHealthPoints(int reduction)
 	{
 		int temp = healthPoints - reduction;

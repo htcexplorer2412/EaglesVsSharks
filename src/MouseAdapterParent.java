@@ -6,7 +6,10 @@ This class tracks the mouse listeners for every tile on the board. All the tiles
 
 Tracking tiles - 
 The object for MouseAdapterParent class is created in the Board class and when the object is created, it passes all the reference to the Tile objects to this class. All the Tile object are stored locally in this class and accessed when mouse click is detected.
+
+Controller in MVC pattern
 */
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -31,11 +34,11 @@ public class MouseAdapterParent extends MouseAdapter implements Subject {
 	private Player eagle, shark;
 	private Observer o;
 	
-	public MouseAdapterParent(Player eagle, Player shark, Game game)
+	public MouseAdapterParent(Player eagle, Player shark)
 	{
 		this.eagle = eagle;
 		this.shark = shark;
-		this.addObserver(game);
+		this.addObserver(Game.getInstance());
 	}
 	
 	public void storeTiles(Tile[][] t)
@@ -43,15 +46,15 @@ public class MouseAdapterParent extends MouseAdapter implements Subject {
 		tile = t;
 	}
 	
-	
+	//Precondition is that dice is rolled
 	public void mouseClicked(MouseEvent e)
 	{
 		//Getting the source of the click
 		JPanel source = (JPanel) e.getComponent();
 		
-		//Translating the source's X and Y coordinates to Tile coordinates set by the Board (which is between 0 and 11, each tile is 42x42 pixels)
-		int pointY = source.getX()/42;
-		int pointX = source.getY()/42;
+		//Translating the source's X and Y coordinates to Tile coordinates set by the Board (which is between 0 and 11, each tile is 50x50 pixels)
+		int pointY = source.getX()/50;
+		int pointX = source.getY()/50;
 		
 		//If dice is rolled and possible number of steps are not taken
 		if(diceRolled && diceValue > 0)
@@ -112,6 +115,7 @@ public class MouseAdapterParent extends MouseAdapter implements Subject {
 					//Checking if the move is valid or not and number of steps taken are less than or equal to the value shown on dice. Repaint the old and new positions if true, else print an error message and let the user select another tile which is valid.
 					if(this.whosTurn)						//Eagle
 					{
+						//Can add pattern here?
 						if(eagle.checkValidMove(this.name, prevPointX, prevPointY, pointX, pointY))
 						{
 							if(temp < this.diceValue)
@@ -148,6 +152,7 @@ public class MouseAdapterParent extends MouseAdapter implements Subject {
 					}
 					else									//Shark
 					{
+						//Can add pattern here?
 						if(shark.checkValidMove(this.name, prevPointX, prevPointY, pointX, pointY) && temp <= this.diceValue)
 						{
 							if(temp < this.diceValue)
@@ -216,12 +221,16 @@ public class MouseAdapterParent extends MouseAdapter implements Subject {
 	}
 	
 	//Notify observers when the diceRolled value is changed
+	//Notify about turn as well
 	public void notifyObservers(boolean diceRolled)
 	{
 		this.o.update(diceRolled);
 	}
 	
-	/*public void mouseEntered(MouseEvent e)
+	
+	/*
+	 * can use pattern to show piece data here
+	 * public void mouseEntered(MouseEvent e)
 	{
 		//Object source = e.getSource();
 		Tile tile = (Tile) e.getSource();

@@ -13,6 +13,6 @@ public class australianHawk extends Piece {
 		movement = 'x';
 		shortName = "UE";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/EaglesvsSharks/src/eagle-icons/Sequence 010.jpg");
 	}
 }

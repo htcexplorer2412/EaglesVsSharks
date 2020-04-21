@@ -2,6 +2,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+
+/*
+ * Add a buffer place on board where pieces will be initialized and after dice roll they will be moved to the board.
+ */
+
 public class Board {
 	
 	private JPanel[][] cellPanel;
@@ -14,13 +19,13 @@ public class Board {
 	
 	//private String[][] boardState = new String[][] {{"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}};
 	
-	public Board(JPanel[][] cellPanel, JPanel mainPanel, Player eagle, Player shark, Game game)
+	public Board(JPanel[][] cellPanel, JPanel mainPanel, Player eagle, Player shark)
 	{
 		this.cellPanel = cellPanel;
 		this.mainPanel = mainPanel;
 		t = new Tile[cellPanel.length][cellPanel.length];
 		this.whosTurn = true;
-		this.map = new MouseAdapterParent(eagle, shark, game);
+		this.map = new MouseAdapterParent(eagle, shark);
 		//this.diceRolled = false;
 	}
 	
@@ -55,6 +60,9 @@ public class Board {
 		this.whosTurn = value;
 	}
 	
+	/*
+	 * Island location are fixed on the board. We won't be giving the selection of placing islands to user. Hence, hard-coded.
+	 */
 	public void drawBoard()
 	{
 		for(int i = 0; i < cellPanel.length; i++)

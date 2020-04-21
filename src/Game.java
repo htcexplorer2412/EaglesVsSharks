@@ -5,11 +5,17 @@ import javax.swing.event.ListSelectionListener;
 
 import java.awt.event.*;
 
+
+/*
+ * Class that contains all the functions to show the GUI (View in MVC pattern) 
+ * Class implements Singleton pattern - Only one instance of this class can be created. This instance can be used by any class.
+ */
 public class Game extends JFrame implements Observer {
 
 	/**
 	 * 
 	 */
+	private static Game single_instance = null;
 	private static final long serialVersionUID = 1L;
 	private Player eagle;
 	private Player shark;
@@ -30,7 +36,7 @@ public class Game extends JFrame implements Observer {
 	private char selectionTeam = 'e';
 	
 	
-	public Game()
+	private Game()
 	{
 		this.welcomePage();        
         setVisible(true);
@@ -103,7 +109,7 @@ public class Game extends JFrame implements Observer {
 	{
 		c = getContentPane();
 		//Setting the size of the frame and background of the frame
-		setBounds(10, 10, 800, 800);
+		setBounds(0, 0, 1200, 800);
 		c.setBackground(this.lightBrown);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Game board");
@@ -119,7 +125,7 @@ public class Game extends JFrame implements Observer {
 	private void drawBoardPanel()
 	{
 		//Setting the size of the Main panel and background of the panel
-        mainPanel.setBounds(10, 10, 504, 504);
+        mainPanel.setBounds(10, 10, 600, 600);
         mainPanel.setBackground(new Color(255, 255, 255));
         //Adding main panel to the frame
         c.add(mainPanel);
@@ -127,7 +133,7 @@ public class Game extends JFrame implements Observer {
         eagle = new Player('e');
         shark = new Player('s');
         
-        board = new Board(this.cellPanel, this.mainPanel, this.eagle, this.shark, this);
+        board = new Board(this.cellPanel, this.mainPanel, this.eagle, this.shark);
         board.drawBoard();
         board.arrangeIslands();
 	}
@@ -138,7 +144,7 @@ public class Game extends JFrame implements Observer {
 		BoxLayout bl = new BoxLayout(buttonPanel, BoxLayout.X_AXIS);
 		buttonPanel.setLayout(bl);
 		
-		buttonPanel.setBounds(10, 520, 504, 100);
+		buttonPanel.setBounds(615, 10, 500, 100);
 		buttonPanel.setBackground(lightBrown);
         
         c.add(buttonPanel);
@@ -318,4 +324,12 @@ public class Game extends JFrame implements Observer {
 		// TODO Auto-generated method stub
 		this.diceRolled = diceRolled;
 	}
+	
+	public static Game getInstance() 
+    { 
+        if (single_instance == null) 
+            single_instance = new Game(); 
+  
+        return single_instance; 
+    } 
 }

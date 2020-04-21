@@ -9,6 +9,11 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 
+
+/*
+ * Add valid entry sides for each tile
+ */
+
 public class Tile extends JPanel {
 
 	/**
@@ -60,6 +65,7 @@ public class Tile extends JPanel {
 		return jtf;
 	}
 	
+	
 	public void setTileVisible(MouseAdapterParent map)
 	{
 		this.cellPanel = new JPanel(new BorderLayout());
@@ -74,11 +80,10 @@ public class Tile extends JPanel {
 		mainPanel.add(cellPanel);
 	}
 	
-	/*public void setDiceRolledValue(boolean value)
-	{
-		this.diceRolled = value;
-	}*/
 	
+	/*
+	 * Island location are fixed on the board. We won't be giving the selection of placing islands to user. Hence, hard-coded.
+	 */
 	public void setAsPartOfIsland(String islandType, String tileType)
 	{
 		isPartOfIsland = true;
@@ -206,43 +211,4 @@ public class Tile extends JPanel {
 	         }
 	     }
     }
-
-	//use isClicked to detect the first and second click
-	/*@Override
-	public void mouseClicked(MouseEvent e) 
-	{
-		if(diceRolled)
-		{
-			if(isClicked == 'n')
-			{
-				if(this.whatIsOnTile().toString().charAt(1) == 'E' || this.whatIsOnTile().toString().charAt(1) == 'S')
-				//if(this.whatIsOnTile() != "")
-				{
-					highlightPiece(true);
-					isClicked = 'f';
-				}
-			}
-			else if(isClicked == 'f')
-			{
-				if(this.whatIsOnTile().toString().charAt(1) == 'E' || this.whatIsOnTile().toString().charAt(1) == 'S')
-				{
-					highlightPiece(false);
-					isClicked = 'n';
-				}
-			}
-		}
-	}
-
-	/*@Override
-	public void mousePressed(MouseEvent e) {}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {}
-
-	//Use these two methods to implement pop-up bubble for attributes
-	@Override
-	public void mouseEntered(MouseEvent e) {}
-
-	@Override
-	public void mouseExited(MouseEvent e) {}*/
 }
