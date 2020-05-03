@@ -1,5 +1,10 @@
+import java.io.Serializable;
 
-public class Island {
+public class Island implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String islandType;
 	private String[] locationArray = new String[4];
 	private String[] entryPointArray = new String[2];

@@ -2,6 +2,11 @@ import javax.swing.ImageIcon;
 
 public class australianHawk extends Piece {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public australianHawk()
 	{
 		super();
@@ -13,6 +18,6 @@ public class australianHawk extends Piece {
 		movement = 'x';
 		shortName = "UE";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/EaglesvsSharks/src/eagle-icons/Sequence 010.jpg");
+		pieceIcon = new ImageIcon("src/eagle-icons/Sequence 010.png");
 	}
 }

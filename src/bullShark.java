@@ -1,6 +1,11 @@
 import javax.swing.ImageIcon;
 
-public class bullShark extends Piece {
+public class bullShark extends Piece{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public bullShark()
 	{
@@ -13,6 +18,6 @@ public class bullShark extends Piece {
 		movement = 'x';
 		shortName = "BS";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("src/shark-icons/shark0.png");
 	}
 }

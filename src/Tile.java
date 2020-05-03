@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.io.Serializable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -14,7 +15,7 @@ import javax.swing.border.MatteBorder;
  * Add valid entry sides for each tile
  */
 
-public class Tile extends JPanel {
+public class Tile extends JPanel implements Serializable {
 
 	/**
 	 * 
@@ -142,7 +143,7 @@ public class Tile extends JPanel {
 		cellPanel.add(icon, BorderLayout.CENTER);
 		name.setVisible(false);
 		cellPanel.add(name, BorderLayout.SOUTH);
-		System.out.println(name.getText() + " Tile " + xPos + "," + yPos);
+		//System.out.println(name.getText() + " Tile " + xPos + "," + yPos);
 		cellPanel.repaint();
 		cellPanel.revalidate();
 	}
@@ -172,7 +173,7 @@ public class Tile extends JPanel {
 				{
 					JTextField jtf = (JTextField) this.cellPanel.getComponent(i);
 					temp = jtf.getText();
-					System.out.println(cellPanel.getComponent(i).getClass().toString() + " 1");
+					//System.out.println(cellPanel.getComponent(i).getClass().toString() + " 1");
 					break;
 				}
 			}
@@ -185,7 +186,7 @@ public class Tile extends JPanel {
 				{
 					JTextField jtf = (JTextField) this.cellPanel.getComponent(i);
 					temp = jtf.getText();
-					System.out.println(cellPanel.getComponent(i).getClass().toString() + " 2");
+					//System.out.println(cellPanel.getComponent(i).getClass().toString() + " 2");
 					break;
 				}
 			}

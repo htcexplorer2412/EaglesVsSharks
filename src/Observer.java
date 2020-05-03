@@ -2,4 +2,5 @@
 
 public interface Observer {
 	public void update(boolean diceRolled);
+	public void update(boolean diceRolled, boolean turn);
 }

@@ -1,9 +1,12 @@
 import javax.swing.ImageIcon;
 
-/*
- * Image icon address will change
- */
+
 public class hammerheadShark extends Piece {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public hammerheadShark()
 	{
@@ -16,6 +19,6 @@ public class hammerheadShark extends Piece {
 		movement = '+';
 		shortName = "HS";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("src/shark-icons/shark1.png");
 	}
 }

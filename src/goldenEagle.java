@@ -2,6 +2,11 @@ import javax.swing.ImageIcon;
 
 public class goldenEagle extends Piece {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public goldenEagle()
 	{
 		super();
@@ -10,9 +15,9 @@ public class goldenEagle extends Piece {
 		speed = 70;
 		healthPoints = 600;
 		maxHealthPoints = 600;
-		movement = '+';
+		movement = 'x';
 		shortName = "GE";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("src/eagle-icons/Sequence 015.png");
 	}
 }

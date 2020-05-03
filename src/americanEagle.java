@@ -4,6 +4,11 @@ public class americanEagle extends Piece {
 
 	//private ImageIcon americanEagle = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public americanEagle()
 	{
 		super();
@@ -15,6 +20,6 @@ public class americanEagle extends Piece {
 		movement = '+';
 		shortName = "AE";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("src/eagle-icons/Sequence 011.png");
 	}
 }

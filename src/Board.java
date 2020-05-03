@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -7,57 +9,29 @@ import javax.swing.JTextField;
  * Add a buffer place on board where pieces will be initialized and after dice roll they will be moved to the board.
  */
 
-public class Board {
+public class Board implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel[][] cellPanel;
 	private JPanel mainPanel;
 	private Island island1, island2, island3, island4, island5, island6;
 	private Tile[][] t;
-	private MouseAdapterParent map;
-	private boolean whosTurn;							//true for eagle, false for shark
+	//private MouseAdapterParent map;
 	//private Player eagle, shark;
 	
 	//private String[][] boardState = new String[][] {{"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}};
 	
-	public Board(JPanel[][] cellPanel, JPanel mainPanel, Player eagle, Player shark)
+	public Board(JPanel[][] cellPanel, JPanel mainPanel)
 	{
 		this.cellPanel = cellPanel;
 		this.mainPanel = mainPanel;
 		t = new Tile[cellPanel.length][cellPanel.length];
-		this.whosTurn = true;
-		this.map = new MouseAdapterParent(eagle, shark);
+		//this.map = MouseAdapterParent.getInstance();
+		//this.map = new MouseAdapterParent(eagle, shark);
 		//this.diceRolled = false;
-	}
-	
-	public void setDiceAndTurn(boolean value)
-	{
-		map.setDiceRolledValue(value);
-		//map.setTurn(this.whosTurnItIs());
-	}
-	
-	public void setDiceAndTurn(boolean value, int dValue)
-	{
-		/*for(int i = 0 ; i < t.length; i++)
-		{
-			for(int j = 0; j < t.length; j++)
-			{
-				t[i][j].setDiceRolledValue(value);
-			}
-		}*/
-		
-		map.setDiceRolledValue(value);
-		//map.setTurn(this.whosTurnItIs());
-		map.setRolledValue(dValue);
-	}
-	
-	public boolean whosTurnItIs()
-	{
-		return whosTurn;
-	}
-	
-	public void changeTurn(boolean value)
-	{
-		this.whosTurn = value;
 	}
 	
 	/*
@@ -70,7 +44,7 @@ public class Board {
 			for(int j = 0; j < cellPanel.length; j++)
 			{
 				t[i][j] = new Tile(i, j, cellPanel[i][j], mainPanel);
-				t[i][j].setTileVisible(map);
+				t[i][j].setTileVisible(MouseAdapterParent.getInstance());
 				
 				if((i == 0 && j == 0))
 					t[i][j].setAsPartOfIsland("2x2", "TLS");
@@ -106,7 +80,7 @@ public class Board {
 					t[i][j].setAsPartOfIsland("2x1", "BVE");
 			}
 		}
-		this.map.storeTiles(t);
+		//this.map.storeTiles(t);
 	}
 	
 	public void arrangeIslands()

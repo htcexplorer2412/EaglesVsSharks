@@ -1,7 +1,13 @@
+import java.io.Serializable;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-public abstract class Piece {
+public abstract class Piece implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected int attack, defense, speed, healthPoints, maxHealthPoints;
 	protected char movement;		//'+' for sideways and forwards, backwards; 'x' for diagonal movement; '*' for all directions
 	protected String shortName;
