@@ -2,6 +2,11 @@ import javax.swing.ImageIcon;
 
 public class megatoothShark extends Piece {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public megatoothShark()
 	{
 		super();
@@ -13,6 +18,6 @@ public class megatoothShark extends Piece {
 		movement = 'x';
 		shortName = "TS";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("src/shark-icons/shark6.png");
 	}
 }

@@ -10,8 +10,11 @@ The object for MouseAdapterParent class is created in the Board class and when t
 Controller in MVC pattern
 */
 
+//Update to observer and remove diceValue from this class and use it from Dice class
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -19,35 +22,37 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 //Observer pattern implemented between class Game and class MouseAdapterParent
-public class MouseAdapterParent extends MouseAdapter implements Subject {
+public class MouseAdapterParent extends MouseAdapter implements Observer, Serializable {
 	
 	
 	//Change isClicked to boolean after doing final tests
 	
-	private boolean diceRolled = false, whosTurn;							//whosTurn = true for Eagle team's turn and false for Shark team's turn
-	private int diceValue = 0;
-	private char isClicked = 'n';											//'n' is for no selection, 'f' is when a piece is clicked
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private boolean turn;								//whosTurn = true for Eagle team's turn and false for Shark team's turn
+	private boolean diceRolledLocal;						//Value always changes when an update is received as part of Observer pattern. Value isn't changed internally
+	private char isClicked = 'n';							//'n' is for no selection, 'f' is when a piece is clicked
 	private JLabel icon;
-	private JTextField name;
-	private Tile[][] tile;
+	private String name;
 	private int prevPointX, prevPointY;
-	private Player eagle, shark;
-	private Observer o;
+	private static MouseAdapterParent single_instance = null;
 	
-	public MouseAdapterParent(Player eagle, Player shark)
-	{
-		this.eagle = eagle;
-		this.shark = shark;
-		this.addObserver(Game.getInstance());
-	}
 	
-	public void storeTiles(Tile[][] t)
+	private MouseAdapterParent(){}
+	
+	public synchronized static MouseAdapterParent getInstance()
 	{
-		tile = t;
+		if(single_instance == null)
+			single_instance = new MouseAdapterParent();
+		
+		return single_instance;
 	}
 	
 	//Precondition is that dice is rolled
-	public void mouseClicked(MouseEvent e)
+	//Add a block statement to block clicks for player not on turn
+	public synchronized void mouseClicked(MouseEvent e)
 	{
 		//Getting the source of the click
 		JPanel source = (JPanel) e.getComponent();
@@ -57,179 +62,420 @@ public class MouseAdapterParent extends MouseAdapter implements Subject {
 		int pointX = source.getY()/50;
 		
 		//If dice is rolled and possible number of steps are not taken
-		if(diceRolled && diceValue > 0)
+		if(diceRolledLocal)
 		{
 			//n is when there has been no "click"/selection
 			if(isClicked == 'n')
 			{
-				try
+				//turn true for Player 1, false for Player 2
+				if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Character.toUpperCase(Game.getInstance().getPlayerTeam(this.turn)))
 				{
-					//whosTurn true for eagle, false for shark
-					if(this.whosTurn)
-					{
-						//Player Eagle can select eagle pieces only. If eagle piece selected, then the piece is highlighted and isClicked is changed to 'f'. The JLabel and JTextField component data is stored locally for further use. The coordinates are stored locally as well, to compare and validate the move.
-						if(tile[pointX][pointY].whatIsOnTile().toString().charAt(1) == 'E')
-						{
-							tile[pointX][pointY].highlightPiece(true);
-							icon = tile[pointX][pointY].getIcon();
-							name = tile[pointX][pointY].getJTextField();
-							isClicked = 'f';
-							prevPointX = pointX;
-							prevPointY = pointY;
-						}
-					}
-					else
-					{
-						//Player Shark can select shark pieces only. If shark piece selected, then the piece is highlighted and isClicked is changed to 'f'. The JLabel and JTextField component data is stored locally for further use. The coordinates are stored locally as well, to compare and validate the move.
-						if(tile[pointX][pointY].whatIsOnTile().toString().charAt(1) == 'S')
-						{
-							tile[pointX][pointY].highlightPiece(true);
-							icon = tile[pointX][pointY].getIcon();
-							name = tile[pointX][pointY].getJTextField();
-							isClicked = 'f';
-							prevPointX = pointX;
-							prevPointY = pointY;
-						}
-					}
-				}
-				catch(Exception ex)
-				{
-					
+					Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(true);
+					this.icon = Board.getInstance().getTileViewObj(pointX, pointY).getIcon();
+					this.name = Board.getInstance().getTileObj(pointX, pointY).getOccupierName();
+					isClicked = 'f';
+					prevPointX = pointX;
+					prevPointY = pointY;
 				}
 			}
 			//f is when a Player has selected their piece
 			else if(isClicked == 'f')
 			{
 				//If they select the same piece again, then the piece is deselected and now player can select some other piece to move. If they select an empty tile, then the move validity is checked first. If the piece is allowed to move in that direction, then number of steps are checked. This is where Player can move multiple pieces in one turn. Once the Player has moved steps equivalent to the value on dice, there move is finished. If the Player lands on opposing piece, then battle condition is implemented (incomplete)
-				
-				if(tile[pointX][pointY].whatIsOnTile().equals(this.name.getText()))
+				if(prevPointX == pointX && prevPointY == pointY)
 				{
-					tile[pointX][pointY].highlightPiece(false);
+					Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(false);
 					isClicked = 'n';
 				}
-				else if(tile[pointX][pointY].whatIsOnTile().toString().equals(""))
+				else
 				{
 					//Calculating number of steps here
 					int temp = Math.abs(pointX - prevPointX) > 0 ? Math.abs(pointX - prevPointX) : Math.abs(pointY - prevPointY);
 					
-					//Checking if the move is valid or not and number of steps taken are less than or equal to the value shown on dice. Repaint the old and new positions if true, else print an error message and let the user select another tile which is valid.
-					if(this.whosTurn)						//Eagle
+					if(Game.getInstance().getPlayerObj(this.turn).checkValidMove(this.name, prevPointX, prevPointY, pointX, pointY))
 					{
-						//Can add pattern here?
-						if(eagle.checkValidMove(this.name, prevPointX, prevPointY, pointX, pointY))
+						if(Dice.getInstance().getDiceVal() >= temp)
 						{
-							if(temp < this.diceValue)
+							int i, j;
+							//Check tile and move -- If not successful then send error to view (Game/TileView) class. If opposing piece then ask for battle. If successful, change view (TileView) class
+							if((pointX - prevPointX) > 0 && (pointY - prevPointY) == 0)			//South
 							{
-								tile[pointX][pointY].putPieceOnTile(this.icon, this.name);
-								tile[prevPointX][prevPointY].removePieceFromTile();
-								tile[pointX][pointY].highlightPiece(false);
 								
-								this.diceValue = this.diceValue - temp; 
-								isClicked = 'n';									// or isClicked = 's'
+								for(i = prevPointX; i < pointX; i++)							//Checking for any blocked tiles in the way. If yes, break the loop
+								{
+									if(!Board.getInstance().getTileObj(i, pointY).goSouth())
+									{
+										Game.getInstance().showError("Passage blocked. Move cannot be completed");
+										break;
+									}
+										
+								}
+								if(i == pointX)								//If loop not interrupted, then check for occupiers in the way
+								{
+									for(j = prevPointX + 1; j < pointX; j++)
+									{
+										if(Board.getInstance().getTileObj(j, pointY).getOccupierName() != "")
+										{
+											Game.getInstance().showError("A piece is occupying a tile between the source and destination. Move cannot be completed");
+											break;
+										}
+									}
+									if(j == pointX)
+									{
+										if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().equals(""))		//if tile empty
+										{
+											this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
+											Dice.getInstance().deductDiceVal(temp);
+										}
+										else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupierName().charAt(1))			//if tile occupied by same team piece
+										{
+											Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
+											isClicked = 'n';
+										}
+										else
+										{
+											//BATTLE CONDITION
+										}
+									}
+								}
 							}
-							else if(temp == this.diceValue)
+							else if((pointX - prevPointX) < 0 && (pointY - prevPointY) == 0)	//North
 							{
-								tile[pointX][pointY].putPieceOnTile(this.icon, this.name);
-								tile[prevPointX][prevPointY].removePieceFromTile();
-								tile[pointX][pointY].highlightPiece(false);
-								
-								this.diceValue = 0; 
-								this.diceRolled = !this.diceRolled;
-								this.whosTurn = !this.whosTurn;
-								notifyObservers(this.diceRolled);
-								System.out.println(diceRolled + "," + diceValue);
-								isClicked = 'n';									// or isClicked = 's'
+								for(i = prevPointX; i > pointX; i--)							//Checking for any blocked tiles in the way. If yes, break the loop
+								{
+									if(!Board.getInstance().getTileObj(i, pointY).goNorth())
+									{
+										Game.getInstance().showError("Passage blocked. Move cannot be completed");
+										break;
+									}
+										
+								}
+								if(i == pointX)								//If loop not interrupted, then check for occupiers in the way
+								{
+									for(j = prevPointX - 1; j > pointX; j--)
+									{
+										if(Board.getInstance().getTileObj(j, pointY).getOccupierName() != "")
+										{
+											Game.getInstance().showError("A piece is occupying a tile between the source and destination. Move cannot be completed");
+											break;
+										}
+									}
+									if(j == pointX)
+									{
+										if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().equals(""))		//if tile empty
+										{
+											this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
+											Dice.getInstance().deductDiceVal(temp);
+										}
+										else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupierName().charAt(1))			//if tile occupied by same team piece
+										{
+											Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
+											isClicked = 'n';
+										}
+										else
+										{
+											//BATTLE CONDITION
+										}
+									}
+								}
 							}
-							else
+							else if((pointX - prevPointX) == 0 && (pointY - prevPointY) > 0)	//East
 							{
-								JOptionPane.showMessageDialog(null, "Exceeded the value of dice", "Error", JOptionPane.ERROR_MESSAGE);
+								for(i = prevPointY; i < pointY; i++)							//Checking for any blocked tiles in the way. If yes, break the loop
+								{
+									if(!Board.getInstance().getTileObj(pointX, i).goEast())
+									{
+										Game.getInstance().showError("Passage blocked. Move cannot be completed");
+										break;
+									}
+										
+								}
+								if(i == pointY)								//If loop not interrupted, then check for occupiers in the way
+								{
+									for(j = prevPointY + 1; j < pointY; j++)
+									{
+										if(Board.getInstance().getTileObj(pointX, j).getOccupierName() != "")
+										{
+											Game.getInstance().showError("A piece is occupying a tile between the source and destination. Move cannot be completed");
+											break;
+										}
+									}
+									if(j == pointY)
+									{
+										if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().equals(""))		//if tile empty
+										{
+											this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
+											Dice.getInstance().deductDiceVal(temp);
+										}
+										else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupierName().charAt(1))			//if tile occupied by same team piece
+										{
+											Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
+											isClicked = 'n';
+										}
+										else
+										{
+											//BATTLE CONDITION
+										}
+									}
+								}
+							}
+							else if((pointX - prevPointX) == 0 && (pointY - prevPointY) < 0)	//West
+							{
+								for(i = prevPointY; i > pointY; i--)							//Checking for any blocked tiles in the way. If yes, break the loop
+								{
+									if(!Board.getInstance().getTileObj(pointX, i).goWest())
+									{
+										Game.getInstance().showError("Passage blocked. Move cannot be completed");
+										break;
+									}
+										
+								}
+								if(i == pointY)								//If loop not interrupted, then check for occupiers in the way
+								{
+									for(j = prevPointY - 1; j > pointY; j--)
+									{
+										if(Board.getInstance().getTileObj(pointX, j).getOccupierName() != "")
+										{
+											Game.getInstance().showError("A piece is occupying a tile between the source and destination. Move cannot be completed");
+											break;
+										}
+									}
+									if(j == pointY)
+									{
+										if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().equals(""))		//if tile empty
+										{
+											this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
+											Dice.getInstance().deductDiceVal(temp);
+										}
+										else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupierName().charAt(1))			//if tile occupied by same team piece
+										{
+											Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
+											isClicked = 'n';
+										}
+										else
+										{
+											//BATTLE CONDITION
+										}
+									}
+								}
+							}
+							else if(Math.abs(pointX - prevPointX) == Math.abs(pointY - prevPointY))
+							{
+								int k;
+								if((pointX - prevPointX) < 0 && (pointY - prevPointY) > 0)		//North-East
+								{
+									k = prevPointY;
+									for(i = prevPointX; i > pointX; i--)							//Checking for any blocked tiles in the way. If yes, break the loop
+									{
+										if(!Board.getInstance().getTileObj(i, k).goNorthEast())
+										{
+											Game.getInstance().showError("Passage blocked. Move cannot be completed");
+											break;
+										}
+										k++;
+									}
+									if(i == pointX && k == pointY)								//If loop not interrupted, then check for occupiers in the way
+									{
+										k = prevPointY + 1;
+										for(j = prevPointX - 1; j > pointX; j--)
+										{
+											if(Board.getInstance().getTileObj(j, k).getOccupierName() != "")
+											{
+												Game.getInstance().showError("A piece is occupying a tile between the source and destination. Move cannot be completed");
+												break;
+											}
+											k++;
+										}
+										if(j == pointX && k == pointY)
+										{
+											if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().equals(""))		//if tile empty
+											{
+												this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
+												Dice.getInstance().deductDiceVal(temp);
+											}
+											else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupierName().charAt(1))			//if tile occupied by same team piece
+											{
+												Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
+												isClicked = 'n';
+											}
+											else
+											{
+												//BATTLE CONDITION
+											}
+										}
+									}
+								}
+								else if((pointX - prevPointX) < 0 && (pointY - prevPointY) < 0)	//North-West
+								{
+									k = prevPointY;
+									for(i = prevPointX; i > pointX; i--)							//Checking for any blocked tiles in the way. If yes, break the loop
+									{
+										if(!Board.getInstance().getTileObj(i, k).goNorthWest())
+										{
+											Game.getInstance().showError("Passage blocked. Move cannot be completed");
+											break;
+										}
+										k--;
+									}
+									if(i == pointX && k == pointY)								//If loop not interrupted, then check for occupiers in the way
+									{
+										k = prevPointY - 1;
+										for(j = prevPointX - 1; j > pointX; j--)
+										{
+											if(Board.getInstance().getTileObj(j, k).getOccupierName() != "")
+											{
+												Game.getInstance().showError("A piece is occupying a tile between the source and destination. Move cannot be completed");
+												break;
+											}
+											k--;
+										}
+										if(j == pointX && k == pointY)
+										{
+											if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().equals(""))		//if tile empty
+											{
+												this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
+												Dice.getInstance().deductDiceVal(temp);
+											}
+											else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupierName().charAt(1))			//if tile occupied by same team piece
+											{
+												Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
+												isClicked = 'n';
+											}
+											else
+											{
+												//BATTLE CONDITION
+											}
+										}
+									}
+								}
+								else if((pointX - prevPointX) > 0 && (pointY - prevPointY) > 0)	//South-East
+								{
+									k = prevPointY;
+									for(i = prevPointX; i < pointX; i++)							//Checking for any blocked tiles in the way. If yes, break the loop
+									{
+										if(!Board.getInstance().getTileObj(i, k).goSouthEast())
+										{
+											Game.getInstance().showError("Passage blocked. Move cannot be completed");
+											break;
+										}
+										k++;
+									}
+									if(i == pointX && k == pointY)								//If loop not interrupted, then check for occupiers in the way
+									{
+										k = prevPointY + 1;
+										for(j = prevPointX + 1; j < pointX; j++)
+										{
+											if(Board.getInstance().getTileObj(j, k).getOccupierName() != "")
+											{
+												Game.getInstance().showError("A piece is occupying a tile between the source and destination. Move cannot be completed");
+												break;
+											}
+											k++;
+										}
+										if(j == pointX && k == pointY)
+										{
+											if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().equals(""))		//if tile empty
+											{
+												this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
+												Dice.getInstance().deductDiceVal(temp);
+											}
+											else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupierName().charAt(1))			//if tile occupied by same team piece
+											{
+												Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
+												isClicked = 'n';
+											}
+											else
+											{
+												//BATTLE CONDITION
+											}
+										}
+									}
+								}
+								else if((pointX - prevPointX) > 0 && (pointY - prevPointY) < 0)	//South-West
+								{
+									k = prevPointY;
+									for(i = prevPointX; i < pointX; i++)							//Checking for any blocked tiles in the way. If yes, break the loop
+									{
+										if(!Board.getInstance().getTileObj(i, k).goSouthWest())
+										{
+											Game.getInstance().showError("Passage blocked. Move cannot be completed");
+											break;
+										}
+										k--;
+									}
+									if(i == pointX && k == pointY)								//If loop not interrupted, then check for occupiers in the way
+									{
+										k = prevPointY - 1;
+										for(j = prevPointX + 1; j < pointX; j++)
+										{
+											if(Board.getInstance().getTileObj(j, k).getOccupierName() != "")
+											{
+												Game.getInstance().showError("A piece is occupying a tile between the source and destination. Move cannot be completed");
+												break;
+											}
+											k--;
+										}
+										if(j == pointX && k == pointY)
+										{
+											if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().equals(""))		//if tile empty
+											{
+												this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
+												Dice.getInstance().deductDiceVal(temp);
+											}
+											else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupierName().charAt(1))			//if tile occupied by same team piece
+											{
+												Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
+												isClicked = 'n';
+											}
+											else
+											{
+												//BATTLE CONDITION
+											}
+										}
+									}
+								}
 							}
 						}
 						else
 						{
-							JOptionPane.showMessageDialog(null, "Invalid move for this piece", "Error", JOptionPane.ERROR_MESSAGE);
+							Game.getInstance().showError("Exceeded the value of dice!");
 						}
 					}
-					else									//Shark
+					else
 					{
-						//Can add pattern here?
-						if(shark.checkValidMove(this.name, prevPointX, prevPointY, pointX, pointY) && temp <= this.diceValue)
-						{
-							if(temp < this.diceValue)
-							{
-								tile[pointX][pointY].putPieceOnTile(this.icon, this.name);
-								tile[prevPointX][prevPointY].removePieceFromTile();
-								tile[pointX][pointY].highlightPiece(false);
-								
-								this.diceValue = this.diceValue - temp; 
-								isClicked = 'n';									// or isClicked = 's'
-							}
-							else if(temp == this.diceValue)
-							{
-								tile[pointX][pointY].putPieceOnTile(this.icon, this.name);
-								tile[prevPointX][prevPointY].removePieceFromTile();
-								tile[pointX][pointY].highlightPiece(false);
-								
-								this.diceValue = 0; 
-								this.diceRolled = !this.diceRolled;
-								this.whosTurn = !this.whosTurn;
-								notifyObservers(this.diceRolled);
-								System.out.println(diceRolled + "," + diceValue); 
-								isClicked = 'n';									// or isClicked = 's'
-							}
-							else
-							{
-								JOptionPane.showMessageDialog(null, "Exceeded the value of dice", "Error", JOptionPane.ERROR_MESSAGE);
-							}
-						}
-						else
-						{
-							JOptionPane.showMessageDialog(null, "Invalid move for this piece", "Error", JOptionPane.ERROR_MESSAGE);
-						}
+						Game.getInstance().showError("Invalid move for this piece!");
 					}
-					
-				}
-				//This part is to be done when battle is introduced (for phase 2)
-				else if((tile[pointX][pointY].whatIsOnTile().toString().charAt(1) == 'S' && this.whosTurn) || (tile[pointX][pointY].whatIsOnTile().toString().charAt(1) == 'E' && !this.whosTurn))
-				{
-					//BATTLE CONDITION
 				}
 			}
 		}
 	}
-	
-	public void setDiceRolledValue(boolean value)
+
+	private void relocatePiece(int prevPointX, int pointX, int prevPointY, int pointY)
 	{
-		this.diceRolled = value;
+		Board.getInstance().getTileObj(pointX, pointY).setOccupierName(name);		//Set occupier name at destination (model)
+		Board.getInstance().getTileViewObj(pointX, pointY).putPieceOnTile(icon);	//Set occupying icon at destination (view)
+		Board.getInstance().getTileObj(prevPointX, prevPointY).setOccupierName("");	//Set occupier name empty at source (model)
+		Board.getInstance().getTileViewObj(prevPointX, prevPointY).removePieceFromTile();	//Remove icon from source (view)
+		Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(false);
+		
+		isClicked = 'n';
 	}
 	
-	public void setRolledValue(int value)
-	{
-		this.diceValue = value;
-	}
-	
-	public void setTurn(boolean value)
-	{
-		this.whosTurn = value;
-	}
-	
-	//Add observers - that are observing this class
 	@Override
-	public void addObserver(Observer o) {
+	public void update(boolean diceRolled) {
 		// TODO Auto-generated method stub
-		this.o = o;
+		this.diceRolledLocal = diceRolled;
 	}
-	
-	//Notify observers when the diceRolled value is changed
-	//Notify about turn as well
-	public void notifyObservers(boolean diceRolled)
-	{
-		this.o.update(diceRolled);
+
+	@Override
+	public void update(boolean diceRolled, boolean turn) {
+		// TODO Auto-generated method stub
+		this.diceRolledLocal = diceRolled;
+		this.turn = turn;
 	}
-	
 	
 	/*
-	 * can use pattern to show piece data here
+	 * can use pattern to show piece data here?
 	 * public void mouseEntered(MouseEvent e)
 	{
 		//Object source = e.getSource();

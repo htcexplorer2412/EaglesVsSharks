@@ -2,6 +2,11 @@ import javax.swing.ImageIcon;
 
 public class makoShark extends Piece {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public makoShark()
 	{
 		super();
@@ -13,6 +18,6 @@ public class makoShark extends Piece {
 		movement = 'x';
 		shortName = "MS";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("src/shark-icons/shark4.png");
 	}
 }

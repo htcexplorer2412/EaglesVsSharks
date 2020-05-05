@@ -1,63 +1,52 @@
+import java.io.Serializable;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+
+import TileFactory.*;
 
 
 /*
  * Add a buffer place on board where pieces will be initialized and after dice roll they will be moved to the board.
  */
 
-public class Board {
+public class Board implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel[][] cellPanel;
 	private JPanel mainPanel;
 	private Island island1, island2, island3, island4, island5, island6;
 	private Tile[][] t;
-	private MouseAdapterParent map;
-	private boolean whosTurn;							//true for eagle, false for shark
+	private TileView[][] tView;
+	//private MouseAdapterParent map;
 	//private Player eagle, shark;
+	private static Board single_instance = null;
 	
 	//private String[][] boardState = new String[][] {{"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}};
 	
-	public Board(JPanel[][] cellPanel, JPanel mainPanel, Player eagle, Player shark)
+	//private Board(JPanel[][] cellPanel, JPanel mainPanel)
+	private Board()
+	{
+		/**/
+	}
+	
+	public synchronized static Board getInstance() 
+    { 
+        if (single_instance  == null) 
+            single_instance = new Board(); 
+  
+        return single_instance; 
+    }
+	
+	public void setBoardPanels(JPanel[][] cellPanel, JPanel mainPanel)
 	{
 		this.cellPanel = cellPanel;
 		this.mainPanel = mainPanel;
-		t = new Tile[cellPanel.length][cellPanel.length];
-		this.whosTurn = true;
-		this.map = new MouseAdapterParent(eagle, shark);
-		//this.diceRolled = false;
-	}
-	
-	public void setDiceAndTurn(boolean value)
-	{
-		map.setDiceRolledValue(value);
-		//map.setTurn(this.whosTurnItIs());
-	}
-	
-	public void setDiceAndTurn(boolean value, int dValue)
-	{
-		/*for(int i = 0 ; i < t.length; i++)
-		{
-			for(int j = 0; j < t.length; j++)
-			{
-				t[i][j].setDiceRolledValue(value);
-			}
-		}*/
-		
-		map.setDiceRolledValue(value);
-		//map.setTurn(this.whosTurnItIs());
-		map.setRolledValue(dValue);
-	}
-	
-	public boolean whosTurnItIs()
-	{
-		return whosTurn;
-	}
-	
-	public void changeTurn(boolean value)
-	{
-		this.whosTurn = value;
+		this.t = new Tile[this.cellPanel.length][this.cellPanel.length];
+		this.tView = new TileView[this.cellPanel.length][this.cellPanel.length];
 	}
 	
 	/*
@@ -65,51 +54,103 @@ public class Board {
 	 */
 	public void drawBoard()
 	{
-		for(int i = 0; i < cellPanel.length; i++)
+		//Putting unbordered and bordered tiles
+		for(int i = 0; i < t.length; i++)
 		{
-			for(int j = 0; j < cellPanel.length; j++)
+			for(int j = 0; j < t.length; j++)
 			{
-				t[i][j] = new Tile(i, j, cellPanel[i][j], mainPanel);
-				t[i][j].setTileVisible(map);
-				
-				if((i == 0 && j == 0))
-					t[i][j].setAsPartOfIsland("2x2", "TLS");
-				else if((i == 0 && j == 1))
-					t[i][j].setAsPartOfIsland("2x2", "TRS");
-				else if((i == 1 && j == 0))
-					t[i][j].setAsPartOfIsland("2x2", "BLS");
-				else if((i == 1 && j == 1))
-					t[i][j].setAsPartOfIsland("2x2", "BRS");
-				else if((i == 10 && j == 10))
-					t[i][j].setAsPartOfIsland("2x2", "TLE");
-				else if((i == 10 && j == 11))
-					t[i][j].setAsPartOfIsland("2x2", "TRE");
-				else if((i == 11 && j == 10))
-					t[i][j].setAsPartOfIsland("2x2", "BLE");
-				else if((i == 11 && j == 11))
-					t[i][j].setAsPartOfIsland("2x2", "BRE");
-				else if((i == 2 && j == 4))
-					t[i][j].setAsPartOfIsland("2x1", "LHS");
-				else if((i == 2 && j == 5))
-					t[i][j].setAsPartOfIsland("2x1", "RHS");
-				else if((i == 8 && j == 2))
-					t[i][j].setAsPartOfIsland("2x1", "TVS");
-				else if((i == 9 && j == 2))
-					t[i][j].setAsPartOfIsland("2x1", "BVS");
-				else if((i == 9 && j == 6))
-					t[i][j].setAsPartOfIsland("2x1", "LHE");
-				else if((i == 9 && j == 7))
-					t[i][j].setAsPartOfIsland("2x1", "RHE");
-				else if((i == 2 && j == 9))
-					t[i][j].setAsPartOfIsland("2x1", "TVE");
-				else if((i == 3 && j == 9))
-					t[i][j].setAsPartOfIsland("2x1", "BVE");
+				if((i <= 1 && j == 1) || (i >= t.length - 2 && j == t.length - 1))
+				{
+					t[i][j] = (EBorderedTile) TileFactory.getTile(4);					//EBordered
+				}
+				else if(i == (t.length/2) - 4 && (j == (t.length/2) - 2 || j == (t.length/2) + 3))
+				{
+					t[i][j] = (NWBorderedTile) TileFactory.getTile(7);					//NWBordered
+				}
+				else if((i == (t.length/2) - 4 && j == (t.length/2) - 1) || (i == (t.length/2) + 2 && j == (t.length/2) - 4))
+				{
+					t[i][j] = (NEBorderedTile) TileFactory.getTile(6);					//NEBordered
+				}
+				else if((i >= t.length - 2 && j == t.length - 2) || (i <= 1 && j == 0))
+				{
+					t[i][j] = (WBorderedTile) TileFactory.getTile(5);					//WBordered
+				}
+				else if(i == (t.length/2) + 3 && (j == (t.length/2) - 4 || j == (t.length/2) + 1))
+				{
+					t[i][j] = (SEBorderedTile) TileFactory.getTile(8);					//SEBordered
+				}
+				else if((i == (t.length/2) - 3 && j == (t.length/2) + 3) || (i == (t.length/2) + 3 && j == t.length/2))
+				{
+					t[i][j] = (SWBorderedTile) TileFactory.getTile(9);					//SWBordered
+				}
+				else
+				{
+					t[i][j] = (unborderedTile) TileFactory.getTile(1);					//Unbordered tile
+				}
 			}
 		}
-		this.map.storeTiles(t);
+		
+		//Setting neighbors for each tile cell
+		for(int i = 0; i < t.length; i++)
+		{
+			for(int j = 0; j < t.length; j++)
+			{
+				if(i == 0)
+				{
+					t[i][j].setNorthNeighbour(null);
+					t[i][j].setSouthNeighbour(t[i + 1][j]);
+				}
+				if(j == 0)
+				{
+					t[i][j].setWestNeighbour(null);
+					t[i][j].setEastNeighbour(t[i][j + 1]);
+				}
+				if(i == t.length - 1)
+				{
+					t[i][j].setNorthNeighbour(t[i - 1][j]);
+					t[i][j].setSouthNeighbour(null);
+				}
+				if(j == t.length - 1)
+				{
+					t[i][j].setEastNeighbour(null);
+					t[i][j].setWestNeighbour(t[i][j - 1]);
+				}
+				if(j > 0 && j < t.length - 1)
+				{
+					t[i][j].setEastNeighbour(t[i][j + 1]);
+					t[i][j].setWestNeighbour(t[i][j - 1]);
+				}
+				if(i > 0 && i < t.length - 1)
+				{
+					t[i][j].setNorthNeighbour(t[i - 1][j]);
+					t[i][j].setSouthNeighbour(t[i + 1][j]);
+				}
+			}
+		}
+		
+		//System.out.println("Length of tile array - " + t.length);
+		for(int i = 0; i < t.length; i++)
+		{
+			for(int j = 0; j < t.length; j++)
+			{
+				tView[i][j] = new TileView(this.cellPanel[i][j], this.mainPanel);
+				tView[i][j].setTileVisible(MouseAdapterParent.getInstance(), j, t[i][j]);
+			}
+		}
+		//Create static method to access TileView class instances from MouseAdapterParent
 	}
 	
-	public void arrangeIslands()
+	public Tile getTileObj(int x, int y)
+	{
+		return t[x][y];
+	}
+	
+	public TileView getTileViewObj(int x, int y)
+	{
+		return tView[x][y];
+	}
+	
+	/*public void arrangeIslands()
 	{
 		island1 = new Island("2x2", 's', 20, 0, 0, 0, 1, 1, 0, 1, 1);
 		island1.setEntryPoints(2, 0, 2, 1);
@@ -128,25 +169,29 @@ public class Board {
 		
 		island6 = new Island("2x2", 'e', 10, 10, 10, 10, 11, 11, 10, 11, 11);
 		island6.setEntryPoints(9, 10, 9, 11);
-	}
+	}*/
 	
-	public void arrangePieceInitial(char team, JLabel[] icon, JTextField[] name)
+	public void arrangePieceInitial(char team, JLabel[] icon, String[] name)
 	{		
 		if(team == 'e')
 		{
 			for(int i = 0; i < icon.length; i++)
 			{
-				t[i + 5][11].putPieceOnTile(icon[i], name[i]);
-				System.out.println("Putting " + name[i].getText() + " on tile " + (i+5) + ",11");
+				tView[i + 5][11].putPieceOnTile(icon[i]);
+				t[i + 5][11].setOccupierName(name[i]);
+				System.out.println("Putting " + name[i] + " on tile " + (i+5) + ",11");
 			}
 		}
 		else if(team == 's')
 		{
 			for(int i = 0; i < icon.length; i++)
 			{
-				t[i + 5][0].putPieceOnTile(icon[i], name[i]);
-				System.out.println("Putting " + name[i].getText() + " on tile " + (i+5) + ",0");
+				tView[i + 5][0].putPieceOnTile(icon[i]);
+				t[i + 5][0].setOccupierName(name[i]);
+				System.out.println("Putting " + name[i] + " on tile " + (i+5) + ",0");
 			}
 		}
 	}
+	
+	
 }

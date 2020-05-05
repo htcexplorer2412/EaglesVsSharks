@@ -2,6 +2,11 @@ import javax.swing.ImageIcon;
 
 public class harpyEagle extends Piece {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public harpyEagle()
 	{
 		super();
@@ -13,6 +18,6 @@ public class harpyEagle extends Piece {
 		movement = '+';
 		shortName = "WE";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("src/eagle-icons/Sequence 013.png");
 	}
 }

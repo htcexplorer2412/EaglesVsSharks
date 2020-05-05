@@ -4,46 +4,100 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import java.awt.event.*;
+import java.io.Serializable;
+import java.util.HashMap;
 
 
 /*
  * Class that contains all the functions to show the GUI (View in MVC pattern) 
  * Class implements Singleton pattern - Only one instance of this class can be created. This instance can be used by any class.
+ * 
+ * Separate welcome page from this class
+ * Implement deep cloning and send clone objects to clients
+ * 
  */
-public class Game extends JFrame implements Observer {
+
+//Implement variable board size and variable number of piece selection
+
+public class Game extends JFrame implements Observer, Serializable {
 
 	/**
 	 * 
 	 */
 	private static Game single_instance = null;
 	private static final long serialVersionUID = 1L;
-	private Player eagle;
-	private Player shark;
+	//private Player eagle;
+	//private Player shark;
 	private Container c;
 	private JPanel mainPanel = new JPanel(new GridLayout(12,12));
 	private JPanel[][] cellPanel = new JPanel[12][12];
 	private JPanel buttonPanel = new JPanel();
-	private Button diceButton, newGameButton, loadGameButton, exitButton, select, next;
+	private Button diceButton, newGameButton, loadGameButton, exitButton, select, next, selectTeam;
 	private TextField tf1;
-	private boolean diceRolled = false;
+	private boolean diceRolledView;							//locally used variable. Stores the incoming update from Dice class
 	private Board board;
-	private Dice dice;
+	//private Dice dice;
 	private final Color lightBrown = new Color(153,102,0);
-	private JList<String> list;
+	private JList<String> list, teamList;
 	private int listSelectionIndex;
+	private String listSelectionValue;
 	private int selectionCount = 0;
 	private int[] selectionIndex = new int[3];
-	private char selectionTeam = 'e';
-	
+	private boolean selectionTeam = true;					//true for player 1 and false for player 2
+	private HashMap <Integer, Player> playerTeamMapping = new HashMap<Integer, Player>();
+	private boolean turn;									//Gets value from the Subject (Dice class) - Remove if not used here
+	public boolean check = false;
 	
 	private Game()
 	{
-		this.welcomePage();        
+		//this.welcomePage();  
+		drawGameContainer();
         setVisible(true);
 	}
 	
-	private void welcomePage()
+	public void setPlayerTeams(String nameSelected) 
 	{
+		if(nameSelected.equals("Eagle"))
+		{
+			System.out.println("Eagle selected");
+			playerTeamMapping.put(1, new Player('e'));
+			playerTeamMapping.put(2, new Player('s'));
+		}
+		else
+		{
+			System.out.println("Shark selected");
+			playerTeamMapping.put(1, new Player('s'));
+			playerTeamMapping.put(2, new Player('e'));
+		}
+	}
+	
+	public char getPlayerTeam(boolean player)
+	{
+		if(player)
+		{
+			return playerTeamMapping.get(1).getTeam();
+		}
+		else
+		{
+			return playerTeamMapping.get(2).getTeam();
+		}
+	}
+	
+	public Player getPlayerObj(boolean player)
+	{
+		if(player)
+		{
+			return playerTeamMapping.get(1);
+		}
+		else
+		{
+			return playerTeamMapping.get(2);
+		}
+	}
+	
+	public void welcomePage()
+	{
+		System.out.println("Enter");
 		c = getContentPane();
 		
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,6 +129,7 @@ public class Game extends JFrame implements Observer {
 		
 		//Listeners for all the buttons
         this.addButtonListeners();
+        //display();
 	}
 	
 	private void addButtonListeners()
@@ -105,7 +160,7 @@ public class Game extends JFrame implements Observer {
 	}
 	
 	//Draws game container which contains Board panel and button panel
-	private void drawGameContainer()
+	protected void drawGameContainer()
 	{
 		c = getContentPane();
 		//Setting the size of the frame and background of the frame
@@ -115,14 +170,17 @@ public class Game extends JFrame implements Observer {
         setTitle("Game board");
         setResizable(false);
         setLayout(null); 
+        c.setVisible(true);
         
         this.drawBoardPanel();
         this.drawButtonPanel();
-        this.selectPiecesPanel();
-        
+        //this.drawSidePanel();
+        this.selectTeam();
+        //this.selectPiecesPanel();
 	}
 	
-	private void drawBoardPanel()
+	//Remove eagle and shark declaration from here and place it in setPlayerTeams 
+	protected void drawBoardPanel()
 	{
 		//Setting the size of the Main panel and background of the panel
         mainPanel.setBounds(10, 10, 600, 600);
@@ -130,21 +188,29 @@ public class Game extends JFrame implements Observer {
         //Adding main panel to the frame
         c.add(mainPanel);
         
-        eagle = new Player('e');
-        shark = new Player('s');
+        //eagle = new Player('e');
+        //shark = new Player('s');
         
-        board = new Board(this.cellPanel, this.mainPanel, this.eagle, this.shark);
-        board.drawBoard();
-        board.arrangeIslands();
+        //board = new Board(this.cellPanel, this.mainPanel);
+        this.board = Board.getInstance();
+        this.board.setBoardPanels(this.cellPanel, this.mainPanel);
+        this.board.drawBoard();
+        //this.board.arrangeIslands();
 	}
 	
-	private void drawButtonPanel()
+	public void display()
+	{
+		System.out.println("Displaying");
+		c.setVisible(true);
+	}
+	
+	protected void drawButtonPanel()
 	{
 		//Button panel currently contains button and textfield for dice. It can include other buttons.
 		BoxLayout bl = new BoxLayout(buttonPanel, BoxLayout.X_AXIS);
 		buttonPanel.setLayout(bl);
 		
-		buttonPanel.setBounds(615, 10, 500, 100);
+		buttonPanel.setBounds(615, 10, 500, 600);
 		buttonPanel.setBackground(lightBrown);
         
         c.add(buttonPanel);
@@ -171,17 +237,13 @@ public class Game extends JFrame implements Observer {
 	}
 	private void addDiceButtonListener()
 	{
-		dice = new Dice();
-		
 		diceButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		if(!diceRolled)
+        		if(!diceRolledView)
         		{
-        			dice.rollDice();
-            		System.out.println(dice.getDiceVal());
-            		tf1.setText(dice.getDiceVal() + "");
-            		diceRolled = true;
-            		board.setDiceAndTurn(true, dice.getDiceVal());
+        			Dice.getInstance().rollDice();
+            		//System.out.println(dice.getDiceVal());
+            		tf1.setText(Dice.getInstance().getDiceVal() + "");
         		}
         		else
         		{
@@ -191,6 +253,34 @@ public class Game extends JFrame implements Observer {
         });
 	}
 	
+	private void selectTeam()
+	{
+		selectTeam = new Button("Select");
+		selectTeam.setMaximumSize(new Dimension(55, 30));
+		
+		String[] teamListNames = {"Eagle", "Shark"};
+		teamList = new JList<String>(teamListNames);
+		
+		teamList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		JScrollPane jsp = new JScrollPane(teamList);
+		jsp.setMaximumSize(new Dimension(230, 100));
+		jsp.setRowHeaderView(new JLabel("Select a team"));
+		
+		teamList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent le) {
+				listSelectionValue = teamList.getSelectedValue();
+		      }
+		    });
+		
+		buttonPanel.add(jsp);
+		buttonPanel.add(Box.createRigidArea(new Dimension(5,0)));		//Filler between components
+		buttonPanel.add(selectTeam);
+		buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));
+		this.teamPanelButtonListener();
+	}
+	
+	//Variable piece selection changes here
 	private void selectPiecesPanel()
 	{
 		select = new Button("Select");
@@ -199,15 +289,15 @@ public class Game extends JFrame implements Observer {
 		select.setMaximumSize(new Dimension(55, 30));
 		next.setMaximumSize(new Dimension(55, 30));
 		
-		if(selectionTeam == 'e')
+		if(selectionTeam)											//Show list for player 1 to select pieces
 		{
-			String[] pieceList = eagle.getPieceNames();
+			String[] pieceList = this.getPlayerObj(selectionTeam).getPieceNames();
 			list = new JList<String>(pieceList);
 			
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			
 			JScrollPane jsp = new JScrollPane(list);
-			jsp.setMaximumSize(new Dimension(230, 100));
+			jsp.setMaximumSize(new Dimension(230, 120));
 			jsp.setRowHeaderView(new JLabel("Select 3 pieces"));
 			
 			list.addListSelectionListener(new ListSelectionListener() {
@@ -222,20 +312,23 @@ public class Game extends JFrame implements Observer {
 			buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));
 			buttonPanel.add(next);
 			
+			buttonPanel.repaint();
+			buttonPanel.revalidate();
+			
 			next.setEnabled(false);
 			select.setEnabled(true);
 			
 			this.piecePanelButtonListeners();
 		}
-		else if(selectionTeam == 's')
+		else if(!selectionTeam)
 		{
-			String[] pieceList = shark.getPieceNames();
+			String[] pieceList = this.getPlayerObj(selectionTeam).getPieceNames();
 			list = new JList<String>(pieceList);
 			
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			
 			JScrollPane jsp = new JScrollPane(list);
-			jsp.setMaximumSize(new Dimension(240, 100));
+			jsp.setMaximumSize(new Dimension(240, 120));
 			jsp.setRowHeaderView(new JLabel("Select 3 pieces"));
 			
 			list.addListSelectionListener(new ListSelectionListener() {
@@ -260,6 +353,17 @@ public class Game extends JFrame implements Observer {
 		}
 	}
 	
+	protected void teamPanelButtonListener()
+	{
+		this.selectTeam.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		setPlayerTeams(listSelectionValue);
+        		buttonPanel.removeAll();
+        		selectPiecesPanel();
+        	}
+        });
+	}
+	
 	private void piecePanelButtonListeners()
 	{	
 		select.addActionListener(new ActionListener() {
@@ -268,7 +372,7 @@ public class Game extends JFrame implements Observer {
         		{
         			if(listSelectionIndex != -1)
             		{
-            			selectionIndex[selectionCount] = listSelectionIndex;
+        				selectionIndex[selectionCount] = listSelectionIndex;
             			selectionCount++;
             		}
         			
@@ -278,33 +382,27 @@ public class Game extends JFrame implements Observer {
         				select.setEnabled(false);
         			}
         		}
-        		/*else
-        		{
-        			JOptionPane.showMessageDialog(null, "You cannot select more than 3 pieces. Please click next", "Error", JOptionPane.ERROR_MESSAGE);
-        			select.setEnabled(false);
-        		}*/
-        		
         	}
         });
 		
 		next.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		if(selectionTeam == 'e')
+        		if(selectionTeam)
         		{
-            		eagle.selectPieces(selectionIndex);
+        			getPlayerObj(selectionTeam).selectPieces(selectionIndex);
             		
-            		board.arrangePieceInitial(selectionTeam, eagle.getIcons(), eagle.getAllNames());
+            		Board.getInstance().arrangePieceInitial(getPlayerTeam(selectionTeam), getPlayerObj(selectionTeam).getIcons(), getPlayerObj(selectionTeam).getAllNames());
             		
             		buttonPanel.removeAll();
-            		selectionTeam = 's';
+            		selectionTeam = !selectionTeam;
             		selectPiecesPanel();
             		selectionCount = 0;
         		}
-        		else if(selectionTeam == 's')
+        		else if(!selectionTeam)
         		{
-        			shark.selectPieces(selectionIndex);
+        			getPlayerObj(selectionTeam).selectPieces(selectionIndex);
         			
-        			board.arrangePieceInitial(selectionTeam, shark.getIcons(), shark.getAllNames());
+        			Board.getInstance().arrangePieceInitial(getPlayerTeam(selectionTeam), getPlayerObj(selectionTeam).getIcons(), getPlayerObj(selectionTeam).getAllNames());
         			
         			selectionCount = 0;
         			buttonPanel.removeAll();
@@ -313,23 +411,38 @@ public class Game extends JFrame implements Observer {
         	}
         });
 	}
-	
-	/*public static void main(String[] args)
-	{
-		new Game();
-	}*/
 
+	public void showError(String s)
+	{
+		JOptionPane.showMessageDialog(null, s, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	
 	@Override
 	public void update(boolean diceRolled) {
 		// TODO Auto-generated method stub
-		this.diceRolled = diceRolled;
+		this.diceRolledView = diceRolled;
+		
+		/*
+		 * To update roll dice button
+		 * if(diceRolled)
+			diceButton.setEnabled(false);
+		else
+			diceButton.setEnabled(true);*/
 	}
+
+	@Override
+	public void update(boolean diceRolled, boolean turn) {
+		// TODO Auto-generated method stub
+		this.diceRolledView = diceRolled;
+		this.turn = turn;
+	} 
 	
-	public static Game getInstance() 
+	public synchronized static Game getInstance() 
     { 
         if (single_instance == null) 
             single_instance = new Game(); 
   
         return single_instance; 
-    } 
+    }
+	
 }

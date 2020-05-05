@@ -1,12 +1,17 @@
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import java.io.Serializable;
 
-public class Player {
+import javax.swing.JLabel;
+
+public class Player implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private char team;						//'e' for eagle, 's' for shark
 	private String[] pieceNames;
 	Piece[] piece = new Piece[3];
 	JLabel[] icons = new JLabel[piece.length];
-	JTextField[] sNames = new JTextField[piece.length];
+	String[] sNames = new String[piece.length];
 	
 	public Player(char team)
 	{
@@ -25,44 +30,38 @@ public class Player {
 				if(pieceNames[pieceIndex[i]].equals("Sea Eagle"))
 				{
 					piece[i] = new seaEagle();
-					System.out.println("Sea Eagle");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("American Eagle"))
 				{
 					piece[i] = new americanEagle();
-					System.out.println("American Eagle");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("Australian Hawk"))
 				{
 					piece[i] = new australianHawk();
-					System.out.println("Australian Hawk");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("White Tailed Eagle"))
 				{
 					piece[i] = new whiteTailedEagle();
-					System.out.println("White Tailed Eagle");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("Golden Eagle"))
 				{
 					piece[i] = new goldenEagle();
-					System.out.println("Golden Eagle");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("Harpy Eagle"))
 				{
 					piece[i] = new harpyEagle();
-					System.out.println("Harpy Eagle");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 			}
 		}
@@ -73,44 +72,38 @@ public class Player {
 				if(pieceNames[pieceIndex[i]].equals("Mako Shark"))
 				{
 					piece[i] = new makoShark();
-					System.out.println("Mako Shark");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("Grey Reef Shark"))
 				{
 					piece[i] = new greyReefShark();
-					System.out.println("Grey Reef Shark");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("Megatooth Shark"))
 				{
 					piece[i] = new megatoothShark();
-					System.out.println("Megatooth Shark");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("Bull Shark"))
 				{
 					piece[i] = new bullShark();
-					System.out.println("Bull Shark");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("Hammerhead Shark"))
 				{
 					piece[i] = new hammerheadShark();
-					System.out.println("Hammerhead Shark");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 				else if(pieceNames[pieceIndex[i]].equals("Mackerel Shark"))
 				{
 					piece[i] = new mackerelShark();
-					System.out.println("Mackerel Shark");
 					icons[i] = piece[i].getIcon();
-					sNames[i] = new JTextField(piece[i].getShortName());
+					sNames[i] = piece[i].getShortName();
 				}
 			}
 		}
@@ -136,20 +129,20 @@ public class Player {
 		return icons;
 	}
 	
-	public JTextField[] getAllNames()
+	public String[] getAllNames()
 	{
 		return sNames;
 	}
 	
 	/*Precondition - X-Y coordinates should be between 0 and board's max size. Piece array should not be empty
 	At the end of execution, supplier guarantees that the result will sent out which will be either true or false (Post condition)*/
-	public boolean checkValidMove(JTextField name, int prevPointX, int prevPointY, int pointX, int pointY)
+	public boolean checkValidMove(String name, int prevPointX, int prevPointY, int pointX, int pointY)
 	{
 		int index = 3;
 		
-		for(int i = 0; i < this.sNames.length; i++)
+		for(int i = 0; i < this.piece.length; i++)
 		{
-			if(sNames[i].getText().toString().equals(name.getText().toString()))
+			if(sNames[i].equals(name))
 			{
 				index = i;
 				break;

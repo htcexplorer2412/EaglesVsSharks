@@ -2,6 +2,11 @@ import javax.swing.ImageIcon;
 
 public class greyReefShark extends Piece {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public greyReefShark()
 	{
 		super();
@@ -13,6 +18,6 @@ public class greyReefShark extends Piece {
 		movement = '+';
 		shortName = "GS";
 		pieceAlive = true;
-		pieceIcon = new ImageIcon("C:/Users/Ayam/Documents/RMIT/Sem 3/OOSD/Assignment/eagleLogo.png");
+		pieceIcon = new ImageIcon("src/shark-icons/shark2.png");
 	}	
 }
