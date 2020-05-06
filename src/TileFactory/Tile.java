@@ -2,6 +2,12 @@ package TileFactory;
 
 import java.io.Serializable;
 
+/*
+ * Abstract Tile class which is the base of the prototypical tiles.
+ * Unbordered and Bordered tile extend the behaviour of this class.
+ * Clone the subclasses to use them in the application.
+ */
+
 public abstract class Tile implements Cloneable, Serializable {
 	
 	/**
@@ -28,6 +34,9 @@ public abstract class Tile implements Cloneable, Serializable {
 		return clone;
 	}
 	
+	/*
+	 * Check if occupier can go in any direction i.e. the direction isn't blocked by borders.
+	 */
 	public abstract boolean goWest();
 	
 	public abstract boolean goEast();
@@ -92,6 +101,9 @@ public abstract class Tile implements Cloneable, Serializable {
 		return false;
 	}
 	
+	/*
+	 * Setters and getters for borders and neighbouring tiles
+	 */
 	public boolean isWestOpen() 
 	{
 		return this.west;

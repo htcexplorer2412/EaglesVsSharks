@@ -2,6 +2,10 @@ package TileFactory;
 
 import java.util.HashMap;
 
+/*
+ * Registry/Cache/Factory of all the protoypical classes. Prototype for specific type of tile can be obtained from here.
+ */
+
 public class TileFactory 
 {
 	private static HashMap<Integer, Tile> tileCache = new HashMap<Integer, Tile>();

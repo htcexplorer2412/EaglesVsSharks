@@ -1,5 +1,8 @@
 package TileFactory;
 
+/*
+ * Unbordered tile - occupier can move in any direction from this tile
+ */
 public class unborderedTile extends Tile {
 
 	/**

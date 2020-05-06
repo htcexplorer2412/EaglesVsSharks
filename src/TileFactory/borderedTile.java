@@ -1,17 +1,9 @@
 package TileFactory;
 /*
- * Generates bordered tile with borders on all sides. Reinitialize using reinitialize()
+ * Abstract class. Initialize a subclass to get specific border for a tile
  */
-public abstract class borderedTile extends Tile {
 
-	/*
-	public void reinitialize(boolean north, boolean south, boolean east, boolean west)
-	{
-		this.north = north;
-		this.south = south;
-		this.east = east;
-		this.west = west;
-	}*/
+public abstract class borderedTile extends Tile {
 	
 	/**
 	 * 
