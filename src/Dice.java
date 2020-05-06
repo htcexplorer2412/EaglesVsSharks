@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 
-//Update to subject
 
 public class Dice implements Subject{
 
@@ -10,7 +9,10 @@ public class Dice implements Subject{
 	final int min = 1, max = 6;
 	private ArrayList<Observer> observerList = new ArrayList<Observer>();
 	private static Dice single_instance = null;
-	
+
+	/*
+	 * Observers added. Player 2 always moves first because Player 1 gets to choose the team.
+	 */
 	private Dice() 
 	{
 		addObserver(Game.getInstance());
@@ -26,12 +28,13 @@ public class Dice implements Subject{
 		return single_instance;
 	}
 	
-	//Change visibility of the method and consider the possibility of limiting the number of times this method can be accessed
-	/*protected void setTurn(boolean value)
-	{
-		this.turn = value;
-	}*/
+	@Override
+	public boolean getDiceRolled() {
+		// TODO Auto-generated method stub
+		return this.diceRolled;
+	}
 	
+	@Override
 	public boolean getTurn()
 	{
 		return this.turn;
@@ -41,9 +44,10 @@ public class Dice implements Subject{
 	{    	
 		this.diceVal = (int)(Math.random()*((max - min) + 1)) + min;
 		this.diceRolled = true;
-		notifyObservers(this.diceRolled);
+		notifyObservers();
 	}
 	
+	@Override
 	public int getDiceVal()
 	{
 		return diceVal;
@@ -53,19 +57,19 @@ public class Dice implements Subject{
 	{
 		if(this.diceRolled)
 		{
-			//this.diceVal = this.diceVal - deduction;
 			if(this.diceVal == deduction)
 			{
 				this.diceVal = this.diceVal - deduction;
 				this.diceRolled = false;
 				this.turn = !this.turn;
 				//Change the turn and update observers here
-				notifyObservers(this.diceRolled, this.turn);
+				notifyObservers();
 				return true;
 			}
 			else if(this.diceVal > deduction)
 			{
 				this.diceVal = this.diceVal - deduction;
+				notifyObservers();
 				return true;
 			}
 			else
@@ -87,21 +91,14 @@ public class Dice implements Subject{
 			this.observerList.add(o);
 	}
 	
-	//Notify observers when the diceRolled value is changed
-		//Notify about turn as well
-	public void notifyObservers(boolean diceRolled)
+	//Notify all the observers
+	@Override
+	public void notifyObservers() 
 	{
+		// TODO Auto-generated method stub
 		for(int i = 0; i < observerList.size(); i++)
 		{
-			this.observerList.get(i).update(diceRolled);
-		}
-	}
-	
-	public void notifyObservers(boolean diceRolled, boolean turn)
-	{
-		for(int i = 0; i < observerList.size(); i++)
-		{
-			this.observerList.get(i).update(diceRolled, turn);
+			this.observerList.get(i).update(this);
 		}
 	}
 }

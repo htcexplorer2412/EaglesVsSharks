@@ -2,4 +2,8 @@
 
 public interface Subject {
 	public void addObserver(Observer o);
+	public void notifyObservers();
+	public boolean getDiceRolled();
+	public int getDiceVal();
+	public boolean getTurn();
 }

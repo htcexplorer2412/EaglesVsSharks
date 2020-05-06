@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 
@@ -9,9 +10,13 @@ public class Player implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private char team;						//'e' for eagle, 's' for shark
 	private String[] pieceNames;
-	Piece[] piece = new Piece[3];
-	JLabel[] icons = new JLabel[piece.length];
-	String[] sNames = new String[piece.length];
+	//Piece[] piece = new Piece[3];					//Change to arraylist
+	private ArrayList<Piece> piece = new ArrayList<Piece>();
+	JLabel[] icons;
+	String[] sNames;
+	//private ArrayList<JLabel> icons = new ArrayList<JLabel>();
+	//private ArrayList<String> sNames = new ArrayList<String>();
+	
 	
 	public Player(char team)
 	{
@@ -21,89 +26,92 @@ public class Player implements Serializable {
 	//Take in 3 attacking piece from players. Let them select.
 	/*Add precondition that pieceIndex is not empty. 
 	At the end of execution, supplier guarantees that there will be an object generated for the piece selected, with icon and name related to that piece (Post condition)*/
-	public void selectPieces(int[] pieceIndex)
+	public void selectPieces(ArrayList<Integer> pieceIndex)
 	{
+		icons = new JLabel[pieceIndex.size()];
+		sNames = new String[pieceIndex.size()];
+		
 		if(this.team == 'e')
 		{
-			for(int i = 0; i < pieceIndex.length; i++)
+			for(int i = 0; i < pieceIndex.size(); i++)
 			{
-				if(pieceNames[pieceIndex[i]].equals("Sea Eagle"))
+				if(pieceNames[pieceIndex.get(i)].equals("Sea Eagle"))
 				{
-					piece[i] = new seaEagle();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new seaEagle());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("American Eagle"))
+				else if(pieceNames[pieceIndex.get(i)].equals("American Eagle"))
 				{
-					piece[i] = new americanEagle();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new americanEagle());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("Australian Hawk"))
+				else if(pieceNames[pieceIndex.get(i)].equals("Australian Hawk"))
 				{
-					piece[i] = new australianHawk();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new australianHawk());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("White Tailed Eagle"))
+				else if(pieceNames[pieceIndex.get(i)].equals("White Tailed Eagle"))
 				{
-					piece[i] = new whiteTailedEagle();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new whiteTailedEagle());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("Golden Eagle"))
+				else if(pieceNames[pieceIndex.get(i)].equals("Golden Eagle"))
 				{
-					piece[i] = new goldenEagle();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new goldenEagle());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("Harpy Eagle"))
+				else if(pieceNames[pieceIndex.get(i)].equals("Harpy Eagle"))
 				{
-					piece[i] = new harpyEagle();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new harpyEagle());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
 			}
 		}
 		else
 		{
-			for(int i = 0; i < pieceIndex.length; i++)
+			for(int i = 0; i < pieceIndex.size(); i++)
 			{
-				if(pieceNames[pieceIndex[i]].equals("Mako Shark"))
+				if(pieceNames[pieceIndex.get(i)].equals("Mako Shark"))
 				{
-					piece[i] = new makoShark();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new makoShark());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("Grey Reef Shark"))
+				else if(pieceNames[pieceIndex.get(i)].equals("Grey Reef Shark"))
 				{
-					piece[i] = new greyReefShark();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new greyReefShark());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("Megatooth Shark"))
+				else if(pieceNames[pieceIndex.get(i)].equals("Megatooth Shark"))
 				{
-					piece[i] = new megatoothShark();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new megatoothShark());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("Bull Shark"))
+				else if(pieceNames[pieceIndex.get(i)].equals("Bull Shark"))
 				{
-					piece[i] = new bullShark();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new bullShark());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("Hammerhead Shark"))
+				else if(pieceNames[pieceIndex.get(i)].equals("Hammerhead Shark"))
 				{
-					piece[i] = new hammerheadShark();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new hammerheadShark());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
-				else if(pieceNames[pieceIndex[i]].equals("Mackerel Shark"))
+				else if(pieceNames[pieceIndex.get(i)].equals("Mackerel Shark"))
 				{
-					piece[i] = new mackerelShark();
-					icons[i] = piece[i].getIcon();
-					sNames[i] = piece[i].getShortName();
+					piece.add(new mackerelShark());
+					icons[i] = piece.get(i).getIcon();
+					sNames[i] = piece.get(i).getShortName();
 				}
 			}
 		}
@@ -140,7 +148,7 @@ public class Player implements Serializable {
 	{
 		int index = 3;
 		
-		for(int i = 0; i < this.piece.length; i++)
+		for(int i = 0; i < this.piece.size(); i++)
 		{
 			if(sNames[i].equals(name))
 			{
@@ -149,7 +157,7 @@ public class Player implements Serializable {
 			}
 		}
 		
-		char orientation = piece[index].getMovementOrientation();
+		char orientation = piece.get(index).getMovementOrientation();
 		
 		if(orientation == '+')
 		{

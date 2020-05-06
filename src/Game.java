@@ -1,11 +1,8 @@
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import java.awt.event.*;
 import java.io.Serializable;
-import java.util.HashMap;
 
 
 /*
@@ -26,11 +23,11 @@ public class Game extends JFrame implements Observer, Serializable {
 	 */
 	private static Game single_instance = null;
 	private static final long serialVersionUID = 1L;
-	//private Player eagle;
-	//private Player shark;
 	private Container c;
-	private JPanel mainPanel = new JPanel(new GridLayout(12,12));
-	private JPanel[][] cellPanel = new JPanel[12][12];
+	//private JPanel mainPanel = new JPanel(new GridLayout(12,12));
+	//private JPanel[][] cellPanel = new JPanel[12][12];
+	private JPanel mainPanel;
+	private JPanel[][] cellPanel;
 	private JPanel buttonPanel = new JPanel();
 	private Button diceButton, newGameButton, loadGameButton, exitButton, select, next, selectTeam;
 	private TextField tf1;
@@ -39,65 +36,23 @@ public class Game extends JFrame implements Observer, Serializable {
 	//private Dice dice;
 	private final Color lightBrown = new Color(153,102,0);
 	private JList<String> list, teamList;
-	private int listSelectionIndex;
-	private String listSelectionValue;
-	private int selectionCount = 0;
-	private int[] selectionIndex = new int[3];
 	private boolean selectionTeam = true;					//true for player 1 and false for player 2
-	private HashMap <Integer, Player> playerTeamMapping = new HashMap<Integer, Player>();
 	private boolean turn;									//Gets value from the Subject (Dice class) - Remove if not used here
-	public boolean check = false;
+	//public boolean check = false;
+	int containerWidth, containerHeight, mainPanelWidth, mainPanelHeight, buttonPanelWidth, buttonPanelHeight, buttonPanelX, buttonPanelY;
 	
 	private Game()
 	{
 		//this.welcomePage();  
-		drawGameContainer();
+		//drawGameContainer();
+		setDefaultLookAndFeelDecorated(true);
+		boardTypesAndPieceSelections();
         setVisible(true);
-	}
-	
-	public void setPlayerTeams(String nameSelected) 
-	{
-		if(nameSelected.equals("Eagle"))
-		{
-			System.out.println("Eagle selected");
-			playerTeamMapping.put(1, new Player('e'));
-			playerTeamMapping.put(2, new Player('s'));
-		}
-		else
-		{
-			System.out.println("Shark selected");
-			playerTeamMapping.put(1, new Player('s'));
-			playerTeamMapping.put(2, new Player('e'));
-		}
-	}
-	
-	public char getPlayerTeam(boolean player)
-	{
-		if(player)
-		{
-			return playerTeamMapping.get(1).getTeam();
-		}
-		else
-		{
-			return playerTeamMapping.get(2).getTeam();
-		}
-	}
-	
-	public Player getPlayerObj(boolean player)
-	{
-		if(player)
-		{
-			return playerTeamMapping.get(1);
-		}
-		else
-		{
-			return playerTeamMapping.get(2);
-		}
 	}
 	
 	public void welcomePage()
 	{
-		System.out.println("Enter");
+		//System.out.println("Enter");
 		c = getContentPane();
 		
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -159,12 +114,73 @@ public class Game extends JFrame implements Observer, Serializable {
         });
 	}
 	
+	//Board size selection
+	protected void boardTypesAndPieceSelections()
+	{
+		c = getContentPane();
+		
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Select board size");
+        
+        Button button1 = new Button("12x12");
+        Button button2 = new Button("14x14");
+        Button button3 = new Button("16x16");
+        
+        //Adding all buttons in vertical layout
+        JPanel Panel = new JPanel();
+        //BoxLayout vb = new BoxLayout(vPanel, BoxLayout.Y_AXIS);
+        Panel.setLayout(new GridLayout(3,0));
+
+        Panel.setBounds(0, 0, 245, 230);
+        
+        Panel.add(button1);
+        Panel.add(button2);
+        Panel.add(button3);
+        
+        c.add(Panel);
+        c.setVisible(true);
+        setResizable(false);
+        setLayout(null);
+        //Setting the size of the frame and background of the frame
+        setBounds(100, 100, 250, 250);
+		c.setBackground(Color.WHITE);
+		
+		ButtonController bc = new ButtonController();
+		button1.setActionCommand("12x12");
+		button2.setActionCommand("14x14");
+		button3.setActionCommand("16x16");
+		button1.addActionListener(bc);
+		button2.addActionListener(bc);
+		button3.addActionListener(bc);
+		
+	}
+	
+	protected void setBoardSize(int i, int j)
+	{
+		c.removeAll();
+		System.out.println("i - " + i + ", j - " + j);
+		mainPanel = new JPanel(new GridLayout(i,j));
+		cellPanel = new JPanel[i][j];
+		
+		containerWidth = 1500;
+		containerHeight = 800;
+		mainPanelWidth = 50*i;
+		mainPanelHeight = 50*i;
+		buttonPanelX = mainPanelWidth + 15;
+		buttonPanelY = 10;
+		buttonPanelWidth = containerWidth - mainPanelWidth - 15;
+		buttonPanelHeight = containerHeight;
+		
+		drawGameContainer();
+	}
+	
 	//Draws game container which contains Board panel and button panel
 	protected void drawGameContainer()
 	{
 		c = getContentPane();
 		//Setting the size of the frame and background of the frame
-		setBounds(0, 0, 1200, 800);
+		//containerWidth, containerHeight
+		setBounds(0, 0, containerWidth, containerHeight);
 		c.setBackground(this.lightBrown);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Game board");
@@ -174,34 +190,29 @@ public class Game extends JFrame implements Observer, Serializable {
         
         this.drawBoardPanel();
         this.drawButtonPanel();
-        //this.drawSidePanel();
         this.selectTeam();
-        //this.selectPiecesPanel();
 	}
 	
 	//Remove eagle and shark declaration from here and place it in setPlayerTeams 
 	protected void drawBoardPanel()
 	{
 		//Setting the size of the Main panel and background of the panel
-        mainPanel.setBounds(10, 10, 600, 600);
+		//mainPanelWidth, mainPanelHeight
+        mainPanel.setBounds(10, 10, mainPanelWidth, mainPanelHeight);
         mainPanel.setBackground(new Color(255, 255, 255));
         //Adding main panel to the frame
         c.add(mainPanel);
         
-        //eagle = new Player('e');
-        //shark = new Player('s');
-        
-        //board = new Board(this.cellPanel, this.mainPanel);
         this.board = Board.getInstance();
         this.board.setBoardPanels(this.cellPanel, this.mainPanel);
         this.board.drawBoard();
-        //this.board.arrangeIslands();
 	}
 	
-	public void display()
+	public void clearButtonPanel()
 	{
-		System.out.println("Displaying");
-		c.setVisible(true);
+		buttonPanel.removeAll();
+		buttonPanel.revalidate();
+		buttonPanel.repaint();
 	}
 	
 	protected void drawButtonPanel()
@@ -210,20 +221,21 @@ public class Game extends JFrame implements Observer, Serializable {
 		BoxLayout bl = new BoxLayout(buttonPanel, BoxLayout.X_AXIS);
 		buttonPanel.setLayout(bl);
 		
-		buttonPanel.setBounds(615, 10, 500, 600);
+		//buttonPanelStartX, buttonPanelStartY, buttonPanelWidth, buttonPanelHeight
+		buttonPanel.setBounds(buttonPanelX, buttonPanelY, buttonPanelWidth, buttonPanelHeight);
 		buttonPanel.setBackground(lightBrown);
         
         c.add(buttonPanel);
 	}
 	
-	private void addDiceButtonToPanel()
+	protected void addDiceButtonToPanel()
 	{
 		diceButton = new Button("Roll dice");
         tf1 = new TextField();
         tf1.setEditable(false);
         
         diceButton.setMaximumSize(new Dimension(55, 30));
-        tf1.setMaximumSize(new Dimension(20, 30));
+        tf1.setMaximumSize(new Dimension(30, 30));
         
         buttonPanel.add(diceButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));
@@ -232,25 +244,22 @@ public class Game extends JFrame implements Observer, Serializable {
         
         buttonPanel.repaint();
 		buttonPanel.revalidate();
-
-        this.addDiceButtonListener();
+		
+		diceButton.setActionCommand("Dice");
+		ButtonController bc = new ButtonController(); 
+		diceButton.addActionListener(bc);
+        //this.addDiceButtonListener();
 	}
-	private void addDiceButtonListener()
+	
+	protected void setDiceFieldValue(int value)
 	{
-		diceButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		if(!diceRolledView)
-        		{
-        			Dice.getInstance().rollDice();
-            		//System.out.println(dice.getDiceVal());
-            		tf1.setText(Dice.getInstance().getDiceVal() + "");
-        		}
-        		else
-        		{
-        			System.out.println("Move not complete yet!");
-        		}
-        	}
-        });
+		tf1.setText(Integer.toString(value));
+		tf1.setEditable(false);
+	}
+	
+	protected void changeStateOfDiceButton(boolean value)
+	{
+		diceButton.setEnabled(value);
 	}
 	
 	private void selectTeam()
@@ -267,21 +276,36 @@ public class Game extends JFrame implements Observer, Serializable {
 		jsp.setMaximumSize(new Dimension(230, 100));
 		jsp.setRowHeaderView(new JLabel("Select a team"));
 		
-		teamList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent le) {
-				listSelectionValue = teamList.getSelectedValue();
-		      }
-		    });
+		ButtonController bc = new ButtonController();
+		teamList.addListSelectionListener(bc);
 		
 		buttonPanel.add(jsp);
 		buttonPanel.add(Box.createRigidArea(new Dimension(5,0)));		//Filler between components
 		buttonPanel.add(selectTeam);
 		buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));
-		this.teamPanelButtonListener();
+		selectTeam.setActionCommand("Team Select");
+		selectTeam.addActionListener(bc);
+		//this.teamPanelButtonListener();
+	}
+	
+	protected void disableSelectEnableNext()
+	{
+		next.setEnabled(true);
+		select.setEnabled(false);
+	}
+	
+	protected boolean getWhichPlayerSelecting()
+	{
+		return selectionTeam;
+	}
+	
+	protected void setWhichPlayerSelecting(boolean value)
+	{
+		selectionTeam = value;
 	}
 	
 	//Variable piece selection changes here
-	private void selectPiecesPanel()
+	protected void selectPiecesPanel()
 	{
 		select = new Button("Select");
 		next = new Button("Next");
@@ -291,7 +315,7 @@ public class Game extends JFrame implements Observer, Serializable {
 		
 		if(selectionTeam)											//Show list for player 1 to select pieces
 		{
-			String[] pieceList = this.getPlayerObj(selectionTeam).getPieceNames();
+			String[] pieceList = PlayerRegistry.getPlayerObj(selectionTeam).getPieceNames();
 			list = new JList<String>(pieceList);
 			
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -300,11 +324,8 @@ public class Game extends JFrame implements Observer, Serializable {
 			jsp.setMaximumSize(new Dimension(230, 120));
 			jsp.setRowHeaderView(new JLabel("Select 3 pieces"));
 			
-			list.addListSelectionListener(new ListSelectionListener() {
-			      public void valueChanged(ListSelectionEvent le) {
-			        listSelectionIndex = list.getSelectedIndex();
-			      }
-			    });
+			ButtonController bc = new ButtonController();
+			list.addListSelectionListener(bc);
 			
 			buttonPanel.add(jsp);
 			buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));		//Filler between components
@@ -318,11 +339,15 @@ public class Game extends JFrame implements Observer, Serializable {
 			next.setEnabled(false);
 			select.setEnabled(true);
 			
-			this.piecePanelButtonListeners();
+			select.setActionCommand("Piece Select");
+			next.setActionCommand("Next");
+			
+			select.addActionListener(bc);
+			next.addActionListener(bc);
 		}
 		else if(!selectionTeam)
 		{
-			String[] pieceList = this.getPlayerObj(selectionTeam).getPieceNames();
+			String[] pieceList = PlayerRegistry.getPlayerObj(selectionTeam).getPieceNames();
 			list = new JList<String>(pieceList);
 			
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -331,11 +356,8 @@ public class Game extends JFrame implements Observer, Serializable {
 			jsp.setMaximumSize(new Dimension(240, 120));
 			jsp.setRowHeaderView(new JLabel("Select 3 pieces"));
 			
-			list.addListSelectionListener(new ListSelectionListener() {
-			      public void valueChanged(ListSelectionEvent le) {
-			        listSelectionIndex = list.getSelectedIndex();
-			      }
-			    });
+			ButtonController bc = new ButtonController();
+			list.addListSelectionListener(bc);
 			
 			buttonPanel.add(jsp);
 			buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));		//Filler between components
@@ -349,67 +371,12 @@ public class Game extends JFrame implements Observer, Serializable {
 			next.setEnabled(false);
 			select.setEnabled(true);
 			
-			this.piecePanelButtonListeners();
+			select.setActionCommand("Piece Select");
+			next.setActionCommand("Next");
+			
+			select.addActionListener(bc);
+			next.addActionListener(bc);
 		}
-	}
-	
-	protected void teamPanelButtonListener()
-	{
-		this.selectTeam.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		setPlayerTeams(listSelectionValue);
-        		buttonPanel.removeAll();
-        		selectPiecesPanel();
-        	}
-        });
-	}
-	
-	private void piecePanelButtonListeners()
-	{	
-		select.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		if(selectionCount < 3)
-        		{
-        			if(listSelectionIndex != -1)
-            		{
-        				selectionIndex[selectionCount] = listSelectionIndex;
-            			selectionCount++;
-            		}
-        			
-        			if(selectionCount == 3)
-        			{
-        				next.setEnabled(true);
-        				select.setEnabled(false);
-        			}
-        		}
-        	}
-        });
-		
-		next.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		if(selectionTeam)
-        		{
-        			getPlayerObj(selectionTeam).selectPieces(selectionIndex);
-            		
-            		Board.getInstance().arrangePieceInitial(getPlayerTeam(selectionTeam), getPlayerObj(selectionTeam).getIcons(), getPlayerObj(selectionTeam).getAllNames());
-            		
-            		buttonPanel.removeAll();
-            		selectionTeam = !selectionTeam;
-            		selectPiecesPanel();
-            		selectionCount = 0;
-        		}
-        		else if(!selectionTeam)
-        		{
-        			getPlayerObj(selectionTeam).selectPieces(selectionIndex);
-        			
-        			Board.getInstance().arrangePieceInitial(getPlayerTeam(selectionTeam), getPlayerObj(selectionTeam).getIcons(), getPlayerObj(selectionTeam).getAllNames());
-        			
-        			selectionCount = 0;
-        			buttonPanel.removeAll();
-        			addDiceButtonToPanel(); 
-        		}
-        	}
-        });
 	}
 
 	public void showError(String s)
@@ -418,23 +385,13 @@ public class Game extends JFrame implements Observer, Serializable {
 	}
 	
 	@Override
-	public void update(boolean diceRolled) {
+	public void update(Subject s) {
 		// TODO Auto-generated method stub
-		this.diceRolledView = diceRolled;
-		
-		/*
-		 * To update roll dice button
-		 * if(diceRolled)
-			diceButton.setEnabled(false);
-		else
-			diceButton.setEnabled(true);*/
-	}
-
-	@Override
-	public void update(boolean diceRolled, boolean turn) {
-		// TODO Auto-generated method stub
-		this.diceRolledView = diceRolled;
-		this.turn = turn;
+		this.diceRolledView = s.getDiceRolled();
+		this.turn = s.getTurn();
+		this.setDiceFieldValue(s.getDiceVal());
+		this.changeStateOfDiceButton(this.diceRolledView);
+		//update textfield from here and diceRoll button
 	} 
 	
 	public synchronized static Game getInstance() 

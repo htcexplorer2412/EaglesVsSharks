@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.io.Serializable;
 
 import javax.swing.BorderFactory;
@@ -25,9 +26,14 @@ public class TileView extends JPanel implements Serializable{
 		this.mainPanel = mainPanel;
 	}
 	
+	/*
+	 * Designing the view of each tile according to the information related to the corresponding Model class
+	 */
 	public void setTileVisible(MouseAdapterParent map, int yPos, Tile t)
 	{
 		this.cellPanel = new JPanel(new BorderLayout());
+		this.cellPanel.setMinimumSize(new Dimension(50,50));
+		this.cellPanel.setMaximumSize(new Dimension(50,50));
 		if(t instanceof unborderedTile)
 		{
 			this.cellPanel.setBorder(new LineBorder(Color.BLACK));

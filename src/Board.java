@@ -3,8 +3,8 @@ import java.io.Serializable;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import TileFactory.*;
-
+import TileFactory.Tile;
+import TileFactory.TileFactory;
 
 /*
  * Add a buffer place on board where pieces will be initialized and after dice roll they will be moved to the board.
@@ -18,16 +18,13 @@ public class Board implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private JPanel[][] cellPanel;
 	private JPanel mainPanel;
-	private Island island1, island2, island3, island4, island5, island6;
+	//private Island island1, island2, island3, island4, island5, island6;
 	private Tile[][] t;
 	private TileView[][] tView;
-	//private MouseAdapterParent map;
-	//private Player eagle, shark;
 	private static Board single_instance = null;
 	
 	//private String[][] boardState = new String[][] {{"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}, {"", "", "", "", "", "", "", "", "", ""}};
 	
-	//private Board(JPanel[][] cellPanel, JPanel mainPanel)
 	private Board()
 	{
 		/**/
@@ -50,42 +47,43 @@ public class Board implements Serializable {
 	}
 	
 	/*
-	 * Island location are fixed on the board. We won't be giving the selection of placing islands to user. Hence, hard-coded.
+	 * Island location are fixed on the board. We won't be giving the selection of placing islands to user
+	 * Each TileView class is linked with a Tile class here. View and model are changed simultaneously.
 	 */
 	public void drawBoard()
 	{
-		//Putting unbordered and bordered tiles
+		//Setting up Tile (Model) class
 		for(int i = 0; i < t.length; i++)
 		{
 			for(int j = 0; j < t.length; j++)
 			{
 				if((i <= 1 && j == 1) || (i >= t.length - 2 && j == t.length - 1))
 				{
-					t[i][j] = (EBorderedTile) TileFactory.getTile(4);					//EBordered
+					t[i][j] = TileFactory.getTile(4);					//EBordered
 				}
 				else if(i == (t.length/2) - 4 && (j == (t.length/2) - 2 || j == (t.length/2) + 3))
 				{
-					t[i][j] = (NWBorderedTile) TileFactory.getTile(7);					//NWBordered
+					t[i][j] = TileFactory.getTile(7);					//NWBordered
 				}
 				else if((i == (t.length/2) - 4 && j == (t.length/2) - 1) || (i == (t.length/2) + 2 && j == (t.length/2) - 4))
 				{
-					t[i][j] = (NEBorderedTile) TileFactory.getTile(6);					//NEBordered
+					t[i][j] = TileFactory.getTile(6);					//NEBordered
 				}
 				else if((i >= t.length - 2 && j == t.length - 2) || (i <= 1 && j == 0))
 				{
-					t[i][j] = (WBorderedTile) TileFactory.getTile(5);					//WBordered
+					t[i][j] = TileFactory.getTile(5);					//WBordered
 				}
 				else if(i == (t.length/2) + 3 && (j == (t.length/2) - 4 || j == (t.length/2) + 1))
 				{
-					t[i][j] = (SEBorderedTile) TileFactory.getTile(8);					//SEBordered
+					t[i][j] = TileFactory.getTile(8);					//SEBordered
 				}
 				else if((i == (t.length/2) - 3 && j == (t.length/2) + 3) || (i == (t.length/2) + 3 && j == t.length/2))
 				{
-					t[i][j] = (SWBorderedTile) TileFactory.getTile(9);					//SWBordered
+					t[i][j] = TileFactory.getTile(9);					//SWBordered
 				}
 				else
 				{
-					t[i][j] = (unborderedTile) TileFactory.getTile(1);					//Unbordered tile
+					t[i][j] = TileFactory.getTile(1);					//Unbordered tile
 				}
 			}
 		}
@@ -128,7 +126,7 @@ public class Board implements Serializable {
 			}
 		}
 		
-		//System.out.println("Length of tile array - " + t.length);
+		//Setting up TileView class
 		for(int i = 0; i < t.length; i++)
 		{
 			for(int j = 0; j < t.length; j++)
@@ -177,9 +175,9 @@ public class Board implements Serializable {
 		{
 			for(int i = 0; i < icon.length; i++)
 			{
-				tView[i + 5][11].putPieceOnTile(icon[i]);
-				t[i + 5][11].setOccupierName(name[i]);
-				System.out.println("Putting " + name[i] + " on tile " + (i+5) + ",11");
+				tView[i + 5][tView.length - 1].putPieceOnTile(icon[i]);
+				t[i + 5][t.length - 1].setOccupierName(name[i]);
+				System.out.println("Putting " + name[i] + " on tile " + (i+5) + "," + (tView.length - 1));
 			}
 		}
 		else if(team == 's')

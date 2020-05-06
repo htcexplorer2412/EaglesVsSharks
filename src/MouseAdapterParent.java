@@ -17,11 +17,9 @@ import java.awt.event.MouseEvent;
 import java.io.Serializable;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
-//Observer pattern implemented between class Game and class MouseAdapterParent
+//Observer pattern implemented between class Dice and class MouseAdapterParent
 public class MouseAdapterParent extends MouseAdapter implements Observer, Serializable {
 	
 	
@@ -51,7 +49,7 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 	}
 	
 	//Precondition is that dice is rolled
-	//Add a block statement to block clicks for player not on turn
+	//Add a block statement to block clicks for player not on turn - for client server
 	public synchronized void mouseClicked(MouseEvent e)
 	{
 		//Getting the source of the click
@@ -68,7 +66,7 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 			if(isClicked == 'n')
 			{
 				//turn true for Player 1, false for Player 2
-				if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Character.toUpperCase(Game.getInstance().getPlayerTeam(this.turn)))
+				if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Character.toUpperCase(PlayerRegistry.getPlayerTeam(this.turn)))
 				{
 					Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(true);
 					this.icon = Board.getInstance().getTileViewObj(pointX, pointY).getIcon();
@@ -81,7 +79,7 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 			//f is when a Player has selected their piece
 			else if(isClicked == 'f')
 			{
-				//If they select the same piece again, then the piece is deselected and now player can select some other piece to move. If they select an empty tile, then the move validity is checked first. If the piece is allowed to move in that direction, then number of steps are checked. This is where Player can move multiple pieces in one turn. Once the Player has moved steps equivalent to the value on dice, there move is finished. If the Player lands on opposing piece, then battle condition is implemented (incomplete)
+				//If they select the same piece again, then the piece is deselected and now player can select some other piece to move. If they select an empty tile, then the move validity is checked first. If the piece is allowed to move in that direction, then number of steps are checked. This is where Player can move multiple pieces in one turn. Once the Player has moved steps equivalent to the value on dice, their move is finished. If the Player lands on opposing piece, then battle condition is implemented (incomplete)
 				if(prevPointX == pointX && prevPointY == pointY)
 				{
 					Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(false);
@@ -92,12 +90,12 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 					//Calculating number of steps here
 					int temp = Math.abs(pointX - prevPointX) > 0 ? Math.abs(pointX - prevPointX) : Math.abs(pointY - prevPointY);
 					
-					if(Game.getInstance().getPlayerObj(this.turn).checkValidMove(this.name, prevPointX, prevPointY, pointX, pointY))
+					if(PlayerRegistry.getPlayerObj(this.turn).checkValidMove(this.name, prevPointX, prevPointY, pointX, pointY))
 					{
 						if(Dice.getInstance().getDiceVal() >= temp)
 						{
 							int i, j;
-							//Check tile and move -- If not successful then send error to view (Game/TileView) class. If opposing piece then ask for battle. If successful, change view (TileView) class
+							//Check tile and move -- If not successful then send error to view (Game/TileView) class. If opposing piece then ask for battle. If successful, change view/model (TileView/Tile) class
 							if((pointX - prevPointX) > 0 && (pointY - prevPointY) == 0)			//South
 							{
 								
@@ -462,16 +460,10 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 	}
 	
 	@Override
-	public void update(boolean diceRolled) {
+	public void update(Subject s) {
 		// TODO Auto-generated method stub
-		this.diceRolledLocal = diceRolled;
-	}
-
-	@Override
-	public void update(boolean diceRolled, boolean turn) {
-		// TODO Auto-generated method stub
-		this.diceRolledLocal = diceRolled;
-		this.turn = turn;
+		this.diceRolledLocal = s.getDiceRolled();
+		this.turn = s.getTurn();
 	}
 	
 	/*
