@@ -49,7 +49,7 @@ public class MoveNorthWestStrategy implements Strategy
 		{
 			if((iterator.currentIndex() <= (iterator.getColumnLength()*prevPointY + prevPointX)) && (prevPointX > pointX && prevPointY > pointY))
 			{
-				if(iterator.currentItem().getOccupierName() != "")
+				if(iterator.currentItem().getOccupier() != null)
 				{
 					return false;
 				}

@@ -43,7 +43,7 @@ public class MoveNorthStrategy implements Strategy
 		{
 			if((iterator.currentIndex() < (iterator.getColumnLength()*prevPointY + prevPointX)) && (iterator.currentIndex() > (iterator.getColumnLength()*pointY + pointX)))
 			{
-				if(iterator.currentItem().getOccupierName() != "")
+				if(iterator.currentItem().getOccupier() != null)
 				{
 					return false;
 				}

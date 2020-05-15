@@ -43,7 +43,8 @@ public class ButtonController implements ActionListener, ListSelectionListener
     			if(listSelectionIndex != -1)
         		{
     				selectionIndex.add(selectionCount, listSelectionIndex);
-    				//Game.getInstance().removeFromList(listSelectionIndex);
+    				PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).selectPieces(listSelectionValue);
+    				Game.getInstance().removeFromList(listSelectionIndex);
     				selectionCount++;
         		}
     			
@@ -58,29 +59,27 @@ public class ButtonController implements ActionListener, ListSelectionListener
 		{
 			if(Game.getInstance().getWhichPlayerSelecting())					//True for player 1, false for player 2
     		{
-    			PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).selectPieces(selectionIndex);
+    			//PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).selectPieces(selectionIndex);
         		
-        		Board.getInstance().arrangePieceInitial(PlayerRegistry.getPlayerTeam(Game.getInstance().getWhichPlayerSelecting()), PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).getIcons(), PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).getAllNames());
+        		Board.getInstance().arrangePieceInitial(PlayerRegistry.getPlayerTeam(Game.getInstance().getWhichPlayerSelecting()), PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).getIcons(), PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).getAllSelectedPieces());
         		
         		Game.getInstance().clearButtonPanel();
         		Game.getInstance().setWhichPlayerSelecting(!Game.getInstance().getWhichPlayerSelecting());
         		//selectionTeam = !selectionTeam;
         		Game.getInstance().selectPiecesPanel();
         		selectionCount = 0;
-        		System.out.println(selectionIndex);
         		selectionIndex.removeAll(selectionIndex);
     		}
     		else if(!Game.getInstance().getWhichPlayerSelecting())
     		{
-    			PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).selectPieces(selectionIndex);
+    			//PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).selectPieces(selectionIndex);
     			
-    			Board.getInstance().arrangePieceInitial(PlayerRegistry.getPlayerTeam(Game.getInstance().getWhichPlayerSelecting()), PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).getIcons(), PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).getAllNames());
+    			Board.getInstance().arrangePieceInitial(PlayerRegistry.getPlayerTeam(Game.getInstance().getWhichPlayerSelecting()), PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).getIcons(), PlayerRegistry.getPlayerObj(Game.getInstance().getWhichPlayerSelecting()).getAllSelectedPieces());
     			
     			selectionCount = 0;
     			Game.getInstance().clearButtonPanel();
     			//buttonPanel.removeAll();
-    			Game.getInstance().addDiceButtonToPanel(); 
-    			System.out.println(selectionIndex);
+    			Game.getInstance().addDiceButtonToPanel();
     		}
 		}
 		
@@ -115,7 +114,6 @@ public class ButtonController implements ActionListener, ListSelectionListener
 		{
 	          @SuppressWarnings("unchecked")
 	          JList<String> list = (JList<String>) e.getSource();
-	          System.out.println(list.getSelectionModel());
 	          listSelectionIndex = list.getSelectedIndex();
 	          //int selections[] = list.getSelectedIndices();
 	          listSelectionValue = list.getSelectedValue();

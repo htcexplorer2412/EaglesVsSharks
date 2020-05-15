@@ -310,7 +310,7 @@ public class Game extends JFrame implements Observer, Serializable {
 		selectionTeam = value;
 	}
 	
-	protected void removeFromList(int index)
+	public void removeFromList(int index)
 	{
 		listModel.remove(index);
 		list.repaint();
@@ -333,15 +333,16 @@ public class Game extends JFrame implements Observer, Serializable {
 		if(selectionTeam)											//Show list for player 1 to select pieces
 		{
 			String[] pieceList = PlayerRegistry.getPlayerObj(selectionTeam).getPieceNames();
-			list = new JList<String>(pieceList);
+			//list = new JList<String>(pieceList);
 
-	        /*listModel = new DefaultListModel<String>();
+	        listModel = new DefaultListModel<String>();
+	        listModel.removeAllElements();
 	        for(int i = 0; i < pieceList.length; i++)
 	        {
 	        	listModel.addElement(pieceList[i]);
 	        }
 	        
-	        list = new JList<String>(listModel);*/
+	        list = new JList<String>(listModel);
 	        
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			
@@ -372,8 +373,17 @@ public class Game extends JFrame implements Observer, Serializable {
 		else if(!selectionTeam)
 		{
 			String[] pieceList = PlayerRegistry.getPlayerObj(selectionTeam).getPieceNames();
-			list = new JList<String>(pieceList);
+			//list = new JList<String>(pieceList);
 			
+			listModel = new DefaultListModel<String>();
+			listModel.removeAllElements();
+	        for(int i = 0; i < pieceList.length; i++)
+	        {
+	        	listModel.addElement(pieceList[i]);
+	        }
+	        
+	        list = new JList<String>(listModel);
+	        
 			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			
 			JScrollPane jsp = new JScrollPane(list);

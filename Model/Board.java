@@ -1,6 +1,7 @@
 package Model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -195,24 +196,24 @@ public class Board implements Serializable {
 		island6.setEntryPoints(9, 10, 9, 11);
 	}*/
 	
-	public void arrangePieceInitial(char team, JLabel[] icon, String[] name)
+	public void arrangePieceInitial(char team, ArrayList<JLabel> icon, ArrayList<Piece> selectedPieces)
 	{		
 		if(team == 'e')
 		{
-			for(int i = 0; i < icon.length; i++)
+			for(int i = 0; i < icon.size(); i++)
 			{
-				tView[i + (tView.length/2) - 1][tView.length - 1].putPieceOnTile(icon[i]);
-				t[i + (t.length/2) - 1][t.length - 1].setOccupierName(name[i]);
-				System.out.println("Putting " + name[i] + " on tile " + (i + (tView.length/2) - 1) + "," + (tView.length - 1));
+				tView[i + (tView.length/2) - 1][tView.length - 1].putPieceOnTile(icon.get(i));
+				t[i + (t.length/2) - 1][t.length - 1].setOccupier(selectedPieces.get(i));
+				//System.out.println("Putting " + name.get(i) + " on tile " + (i + (tView.length/2) - 1) + "," + (tView.length - 1));
 			}
 		}
 		else if(team == 's')
 		{
-			for(int i = 0; i < icon.length; i++)
+			for(int i = 0; i < icon.size(); i++)
 			{
-				tView[i + (tView.length/2) - 1][0].putPieceOnTile(icon[i]);
-				t[i + (t.length/2) - 1][0].setOccupierName(name[i]);
-				System.out.println("Putting " + name[i] + " on tile " + (i + (tView.length/2) - 1) + ",0");
+				tView[i + (tView.length/2) - 1][0].putPieceOnTile(icon.get(i));
+				t[i + (t.length/2) - 1][0].setOccupier(selectedPieces.get(i));
+				//System.out.println("Putting " + name.get(i) + " on tile " + (i + (tView.length/2) - 1) + ",0");
 			}
 		}
 	}

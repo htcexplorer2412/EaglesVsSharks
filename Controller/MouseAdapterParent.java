@@ -79,18 +79,19 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 			if(isClicked == 'n')
 			{
 				//turn true for Player 1, false for Player 2
-				if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Character.toUpperCase(PlayerRegistry.getPlayerTeam(this.turnLocal)))
+				if(Board.getInstance().getTileObj(pointX, pointY).getOccupier() != null)
 				{
-					Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(true);
-					this.icon = Board.getInstance().getTileViewObj(pointX, pointY).getIcon();
-					this.name = Board.getInstance().getTileObj(pointX, pointY).getOccupierName();
-					isClicked = 'f';
-					prevPointX = pointX;
-					prevPointY = pointY;
-				}
-				else
-				{
-					
+					//if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Character.toUpperCase(PlayerRegistry.getPlayerTeam(this.turnLocal)))
+					if(Board.getInstance().getTileObj(pointX, pointY).getOccupier().getShortName().charAt(1) == Character.toUpperCase(PlayerRegistry.getPlayerTeam(this.turnLocal)))	
+					{
+						Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(true);
+						//Board.getInstance().getTileViewObj(pointX, pointY).highlightTile(true);
+						this.icon = Board.getInstance().getTileViewObj(pointX, pointY).getIcon();
+						this.name = Board.getInstance().getTileObj(pointX, pointY).getOccupier().getShortName();
+						isClicked = 'f';
+						prevPointX = pointX;
+						prevPointY = pointY;
+					}
 				}
 			}
 			//f is when a Player has selected their piece
@@ -104,11 +105,12 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 
 	private void relocatePiece(int prevPointX, int pointX, int prevPointY, int pointY)
 	{
-		Board.getInstance().getTileObj(pointX, pointY).setOccupierName(name);		//Set occupier name at destination (model)
+		Board.getInstance().getTileObj(pointX, pointY).setOccupier(Board.getInstance().getTileObj(prevPointX, prevPointY).getOccupier());		//Set occupying piece at destination (model)
 		Board.getInstance().getTileViewObj(pointX, pointY).putPieceOnTile(icon);	//Set occupying icon at destination (view)
-		Board.getInstance().getTileObj(prevPointX, prevPointY).setOccupierName("");	//Set occupier name empty at source (model)
+		Board.getInstance().getTileObj(prevPointX, prevPointY).setOccupier(null);	//Set occupier piece empty at source (model)
 		Board.getInstance().getTileViewObj(prevPointX, prevPointY).removePieceFromTile();	//Remove icon from source (view)
 		Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(false);
+		//Board.getInstance().getTileViewObj(pointX, pointY).highlightTile(false);
 		
 		this.isClicked = 'n';
 	}
@@ -125,6 +127,7 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 		if(prevPointX == pointX && prevPointY == pointY)
 		{
 			Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(false);
+			//Board.getInstance().getTileViewObj(pointX, pointY).highlightTile(false);
 			this.isClicked = 'n';
 		}
 		else
@@ -134,15 +137,16 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 			
 			if(validateMoveLocalObj.validateMove(steps, this.turnLocal, this.name, prevPointX, prevPointY, pointX, pointY))
 			{
-				if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName() == "")
+				if(Board.getInstance().getTileObj(pointX, pointY).getOccupier() == null)
 				{
 					this.relocatePiece(prevPointX, pointX, prevPointY, pointY);
 					Dice.getInstance().deductDiceVal(steps);
 				}
-				else if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == this.name.charAt(1))
+				else if(Board.getInstance().getTileObj(pointX, pointY).getOccupier().getShortName().charAt(1) == this.name.charAt(1))
 				{
 					Game.getInstance().showError("A piece from your team is occupying the destination tile. Move cannot be completed");
 					Board.getInstance().getTileViewObj(prevPointX, prevPointY).highlightPiece(false);
+					//Board.getInstance().getTileViewObj(prevPointX, prevPointY).highlightTile(false);
 					this.isClicked = 'n';
 				}
 				else
@@ -153,6 +157,7 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 			else
 			{
 				Board.getInstance().getTileViewObj(prevPointX, prevPointY).highlightPiece(false);
+				//Board.getInstance().getTileViewObj(prevPointX, prevPointY).highlightTile(false);
 				isClicked = 'n';
 			}
 		}

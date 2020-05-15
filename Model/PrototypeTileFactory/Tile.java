@@ -2,6 +2,8 @@ package Model.PrototypeTileFactory;
 
 import java.io.Serializable;
 
+import Model.Piece;
+
 /*
  * Abstract Tile class which is the base of the prototypical tiles.
  * Unbordered and Bordered tile extend the behaviour of this class.
@@ -16,12 +18,11 @@ public abstract class Tile implements Cloneable, Serializable {
 	private static final long serialVersionUID = 1L;
 	private Tile northNeighbour, southNeighbour, eastNeighbour, westNeighbour;
 	private boolean east, west, north, south;
-	private String occupierName;
-	//private Piece occupier;
+	private Piece occupier;
 	
 	Tile(boolean north, boolean east, boolean south, boolean west)
 	{
-		this.occupierName = "";
+		this.occupier = null;
 		this.northNeighbour = null; 
 		this.southNeighbour = null; 
 		this.eastNeighbour = null; 
@@ -199,13 +200,13 @@ public abstract class Tile implements Cloneable, Serializable {
 		return this.southNeighbour;
 	}
 	
-	public void setOccupierName(String name)
+	public void setOccupier(Piece p)
 	{
-		this.occupierName = name;
+		this.occupier = p;
 	}
 	
-	public String getOccupierName()
+	public Piece getOccupier()
 	{
-		return this.occupierName;
+		return this.occupier;
 	}
 }
