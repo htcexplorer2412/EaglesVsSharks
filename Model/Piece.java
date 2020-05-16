@@ -15,6 +15,17 @@ public abstract class Piece implements Serializable {
 	protected String shortName;
 	protected boolean pieceAlive;
 	protected ImageIcon pieceIcon;
+	protected boolean isMoved = false;						//true if moved, false if not moved
+	
+	public void setIsMoved(boolean moved)
+	{
+		this.isMoved = moved;
+	}
+	
+	public boolean IsMoved()
+	{
+		return isMoved;
+	}
 	
 	public int getAttackPoints()
 	{

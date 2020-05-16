@@ -24,8 +24,10 @@ import javax.swing.JPanel;
 import Model.Board;
 import Model.Dice;
 import Model.PlayerRegistry;
+import Model.Iterator.RowIterator;
 import Model.Observer.Observer;
 import Model.Observer.Subject;
+import Model.PrototypeTileFactory.Tile;
 import View.Game;
 
 
@@ -82,7 +84,7 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 				if(Board.getInstance().getTileObj(pointX, pointY).getOccupier() != null)
 				{
 					//if(Board.getInstance().getTileObj(pointX, pointY).getOccupierName().charAt(1) == Character.toUpperCase(PlayerRegistry.getPlayerTeam(this.turnLocal)))
-					if(Board.getInstance().getTileObj(pointX, pointY).getOccupier().getShortName().charAt(1) == Character.toUpperCase(PlayerRegistry.getPlayerTeam(this.turnLocal)))	
+					if(Board.getInstance().getTileObj(pointX, pointY).getOccupier().getShortName().charAt(1) == Character.toUpperCase(PlayerRegistry.getPlayerTeam(this.turnLocal)) && !Board.getInstance().getTileObj(pointX, pointY).getOccupier().IsMoved())	
 					{
 						Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(true);
 						//Board.getInstance().getTileViewObj(pointX, pointY).highlightTile(true);
@@ -91,6 +93,10 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 						isClicked = 'f';
 						prevPointX = pointX;
 						prevPointY = pointY;
+					}
+					else if(Board.getInstance().getTileObj(pointX, pointY).getOccupier().IsMoved())
+					{
+						Game.getInstance().showError("This piece has already been moved");
 					}
 				}
 			}
@@ -110,6 +116,7 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 		Board.getInstance().getTileObj(prevPointX, prevPointY).setOccupier(null);	//Set occupier piece empty at source (model)
 		Board.getInstance().getTileViewObj(prevPointX, prevPointY).removePieceFromTile();	//Remove icon from source (view)
 		Board.getInstance().getTileViewObj(pointX, pointY).highlightPiece(false);
+		Board.getInstance().getTileObj(pointX, pointY).getOccupier().setIsMoved(true);
 		//Board.getInstance().getTileViewObj(pointX, pointY).highlightTile(false);
 		
 		this.isClicked = 'n';
@@ -118,8 +125,14 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 	@Override
 	public void update(Subject s) {
 		// TODO Auto-generated method stub
-		this.diceRolledLocal = s.getDiceRolled();
-		this.turnLocal = s.getTurn();
+		this.diceRolledLocal = ((Dice) s).getDiceRolled();
+		if(this.turnLocal != ((Dice) s).getTurn())
+		{	
+			this.resetMovedVariable();
+			//reset moved variable for each piece
+		}
+		this.turnLocal = ((Dice) s).getTurn();
+		
 	}
 	
 	private void computeValidity(int pointX, int pointY)
@@ -159,6 +172,19 @@ public class MouseAdapterParent extends MouseAdapter implements Observer, Serial
 				Board.getInstance().getTileViewObj(prevPointX, prevPointY).highlightPiece(false);
 				//Board.getInstance().getTileViewObj(prevPointX, prevPointY).highlightTile(false);
 				isClicked = 'n';
+			}
+		}
+	}
+	
+	private void resetMovedVariable()
+	{
+		RowIterator<Tile> iter = Board.getInstance().getRowIterator();
+		
+		for(iter.first(); !iter.isDone(); iter.next())
+		{
+			if(iter.currentItem().getOccupier() != null)
+			{
+				iter.currentItem().getOccupier().setIsMoved(false);
 			}
 		}
 	}

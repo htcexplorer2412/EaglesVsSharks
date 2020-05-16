@@ -5,6 +5,7 @@ import javax.swing.*;
 
 import Controller.ButtonController;
 import Model.Board;
+import Model.Dice;
 import Model.PlayerRegistry;
 import Model.Observer.*;
 
@@ -188,7 +189,6 @@ public class Game extends JFrame implements Observer, Serializable {
 	{
 		c = getContentPane();
 		//Setting the size of the frame and background of the frame
-		//containerWidth, containerHeight
 		setBounds(-10, 0, containerWidth, containerHeight);
 		c.setBackground(this.lightBrown);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -206,15 +206,13 @@ public class Game extends JFrame implements Observer, Serializable {
 	protected void drawBoardPanel()
 	{
 		//Setting the size of the Main panel and background of the panel
-		//mainPanelWidth, mainPanelHeight
-        mainPanel.setBounds(10, 10, mainPanelWidth, mainPanelHeight);
+		mainPanel.setBounds(10, 10, mainPanelWidth, mainPanelHeight);
         mainPanel.setBackground(new Color(255, 255, 255));
         //Adding main panel to the frame
         c.add(mainPanel);
         
         this.board = Board.getInstance();
-        this.board.setBoardPanels(this.cellPanel, this.mainPanel);
-        this.board.drawBoard();
+        this.board.drawBoard(this.cellPanel, this.mainPanel);
 	}
 	
 	public void clearButtonPanel()
@@ -226,11 +224,10 @@ public class Game extends JFrame implements Observer, Serializable {
 	
 	protected void drawButtonPanel()
 	{
-		//Button panel currently contains button and textfield for dice. It can include other buttons.
+		//Button panel currently contains button and textfield for dice. It can include other components.
 		BoxLayout bl = new BoxLayout(buttonPanel, BoxLayout.X_AXIS);
 		buttonPanel.setLayout(bl);
 		
-		//buttonPanelStartX, buttonPanelStartY, buttonPanelWidth, buttonPanelHeight
 		buttonPanel.setBounds(buttonPanelX, buttonPanelY, buttonPanelWidth, buttonPanelHeight);
 		buttonPanel.setBackground(lightBrown);
         
@@ -291,7 +288,6 @@ public class Game extends JFrame implements Observer, Serializable {
 		buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));
 		selectTeam.setActionCommand("Team Select");
 		selectTeam.addActionListener(bc);
-		//this.teamPanelButtonListener();
 	}
 	
 	public void disableSelectEnableNext()
@@ -320,7 +316,6 @@ public class Game extends JFrame implements Observer, Serializable {
 	/*
 	 * Variable piece selection changes here 
 	 * AI or real life user check here
-	 * Setup listModel properly before using this
 	 */
 	public void selectPiecesPanel()
 	{
@@ -330,99 +325,62 @@ public class Game extends JFrame implements Observer, Serializable {
 		select.setMaximumSize(new Dimension(55, 30));
 		next.setMaximumSize(new Dimension(55, 30));
 		
-		if(selectionTeam)											//Show list for player 1 to select pieces
-		{
-			String[] pieceList = PlayerRegistry.getPlayerObj(selectionTeam).getPieceNames();
-			//list = new JList<String>(pieceList);
-
-	        listModel = new DefaultListModel<String>();
-	        listModel.removeAllElements();
-	        for(int i = 0; i < pieceList.length; i++)
-	        {
-	        	listModel.addElement(pieceList[i]);
-	        }
-	        
-	        list = new JList<String>(listModel);
-	        
-			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			
-			JScrollPane jsp = new JScrollPane(list);
-			jsp.setMaximumSize(new Dimension(230, 120));
-			jsp.setRowHeaderView(new JLabel("Select 3 pieces"));
-			
-			list.addListSelectionListener(bc);
-			
-			buttonPanel.add(jsp);
-			buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));		//Filler between components
-			buttonPanel.add(select);
-			buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));
-			buttonPanel.add(next);
-			
-			buttonPanel.repaint();
-			buttonPanel.revalidate();
-			
-			next.setEnabled(false);
-			select.setEnabled(true);
-			
-			select.setActionCommand("Piece Select");
-			next.setActionCommand("Next");
-			
-			select.addActionListener(bc);
-			next.addActionListener(bc);
-		}
-		else if(!selectionTeam)
-		{
-			String[] pieceList = PlayerRegistry.getPlayerObj(selectionTeam).getPieceNames();
-			//list = new JList<String>(pieceList);
-			
-			listModel = new DefaultListModel<String>();
-			listModel.removeAllElements();
-	        for(int i = 0; i < pieceList.length; i++)
-	        {
-	        	listModel.addElement(pieceList[i]);
-	        }
-	        
-	        list = new JList<String>(listModel);
-	        
-			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			
-			JScrollPane jsp = new JScrollPane(list);
-			jsp.setMaximumSize(new Dimension(240, 120));
-			jsp.setRowHeaderView(new JLabel("Select 3 pieces"));
-			
-			list.addListSelectionListener(bc);
-			
-			buttonPanel.add(jsp);
-			buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));		//Filler between components
-			buttonPanel.add(select);
-			buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));
-			buttonPanel.add(next);
-			
-			buttonPanel.repaint();
-			buttonPanel.revalidate();
-			
-			next.setEnabled(false);
-			select.setEnabled(true);
-			
-			select.setActionCommand("Piece Select");
-			next.setActionCommand("Next");
-			
-			select.addActionListener(bc);
-			next.addActionListener(bc);
-		}
+		listAndButtonSetup(selectionTeam);				//Show list according to the player (1 or 2)
 	}
 
+	private void listAndButtonSetup(boolean team)
+	{
+		String[] pieceList = PlayerRegistry.getPlayerObj(team).getPieceNames();
+		
+        listModel = new DefaultListModel<String>();
+        listModel.removeAllElements();
+        for(int i = 0; i < pieceList.length; i++)
+        {
+        	listModel.addElement(pieceList[i]);
+        }
+        
+        list = new JList<String>(listModel);
+        
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		JScrollPane jsp = new JScrollPane(list);
+		jsp.setMaximumSize(new Dimension(240, 120));
+		jsp.setRowHeaderView(new JLabel("Select 3 pieces"));
+		
+		list.addListSelectionListener(bc);
+		
+		buttonPanel.add(jsp);
+		buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));		//Filler between components
+		buttonPanel.add(select);
+		buttonPanel.add(Box.createRigidArea(new Dimension(3,0)));
+		buttonPanel.add(next);
+		
+		buttonPanel.repaint();
+		buttonPanel.revalidate();
+		
+		next.setEnabled(false);
+		select.setEnabled(true);
+		
+		select.setActionCommand("Piece Select");
+		next.setActionCommand("Next");
+		
+		select.addActionListener(bc);
+		next.addActionListener(bc);
+	}
+	
 	public void showError(String s)
 	{
 		JOptionPane.showMessageDialog(null, s, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
+	//Remove diceRolledView and directly pass it to the method
+	//Remove turn before final submission
 	@Override
 	public void update(Subject s) {
 		// TODO Auto-generated method stub
-		this.diceRolledView = s.getDiceRolled();
-		this.turn = s.getTurn();
-		this.setDiceFieldValue(s.getDiceVal());
+		this.diceRolledView = ((Dice) s).getDiceRolled();
+		this.turn = ((Dice) s).getTurn();
+		this.setDiceFieldValue(((Dice) s).getDiceVal());
 		this.changeStateOfDiceButton(!this.diceRolledView);
 		//update textfield from here and diceRoll button
 	} 

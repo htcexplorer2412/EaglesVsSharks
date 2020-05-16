@@ -7,7 +7,6 @@ import java.io.Serializable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
-import javax.swing.JLayer;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
@@ -23,8 +22,7 @@ public class TileView extends JPanel implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel cellPanel, mainPanel;
-	//private MyLayerUI layerUI;
-	//private JLayer<JPanel> panelLayer;
+	private Color originalColor;
 	
 	public TileView(JPanel cellPanel, JPanel mainPanel)
 	{
@@ -38,9 +36,6 @@ public class TileView extends JPanel implements Serializable{
 	public void setTileVisible(MouseAdapterParent map, int yPos, Tile t)
 	{
 		this.cellPanel = new JPanel(new BorderLayout());
-		//layerUI = new MyLayerUI();
-		//panelLayer = new JLayer<JPanel>(this.cellPanel, layerUI);
-		
 		this.cellPanel.setMinimumSize(new Dimension(50,50));
 		this.cellPanel.setMaximumSize(new Dimension(50,50));
 		if(t instanceof unborderedTile)
@@ -48,9 +43,11 @@ public class TileView extends JPanel implements Serializable{
 			this.cellPanel.setBorder(new LineBorder(Color.BLACK));
 			
 			if(yPos < 6)
-				this.cellPanel.setBackground(new Color(51,153,255));
+				this.originalColor = new Color(51,153,255);
 			else
-				this.cellPanel.setBackground(Color.GRAY);
+				this.originalColor = Color.GRAY;
+			
+			this.cellPanel.setBackground(this.originalColor);
 		}
 		
 		if(t instanceof borderedTile)
@@ -136,18 +133,10 @@ public class TileView extends JPanel implements Serializable{
 	
 	/*public void highlightTile(boolean selected)
 	{
-		
-		if (selected) 
-		{
-	        layerUI.setOverlay(true);
-	    } 
-		else 
-		{
-	        layerUI.setOverlay(false);
-	    }
-		
-		panelLayer.repaint();
-		
+		if (selected)
+			cellPanel.setBackground(Color.GREEN);
+		else
+			cellPanel.setBackground(this.originalColor);
 	}*/
 	
 	public JLabel getIcon()

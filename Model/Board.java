@@ -23,8 +23,6 @@ public class Board implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel[][] cellPanel;
-	private JPanel mainPanel;
 	//private Island island1, island2, island3, island4, island5, island6;
 	private Tile[][] t;
 	private TileView[][] tView;
@@ -45,20 +43,15 @@ public class Board implements Serializable {
         return single_instance; 
     }
 	
-	public void setBoardPanels(JPanel[][] cellPanel, JPanel mainPanel)
-	{
-		this.cellPanel = cellPanel;
-		this.mainPanel = mainPanel;
-		this.t = new Tile[this.cellPanel.length][this.cellPanel.length];
-		this.tView = new TileView[this.cellPanel.length][this.cellPanel.length];
-	}
-	
 	/*
 	 * Island location are fixed on the board. We won't be giving the selection of placing islands to user
 	 * Each TileView class is linked with a Tile class here. View and model are changed simultaneously.
 	 */
-	public void drawBoard()
+	public void drawBoard(JPanel[][] cellPanel, JPanel mainPanel)
 	{
+		this.t = new Tile[cellPanel.length][cellPanel[0].length];
+		this.tView = new TileView[cellPanel.length][cellPanel[0].length];
+		
 		//Setting up Tile (Model) class
 		for(int i = 0; i < t.length; i++)
 		{
@@ -138,11 +131,10 @@ public class Board implements Serializable {
 		{
 			for(int j = 0; j < t[i].length; j++)
 			{
-				tView[i][j] = new TileView(this.cellPanel[i][j], this.mainPanel);
+				tView[i][j] = new TileView(cellPanel[i][j], mainPanel);
 				tView[i][j].setTileVisible(MouseAdapterParent.getInstance(), j, t[i][j]);
 			}
 		}
-		//Create static method to access TileView class instances from MouseAdapterParent
 	}
 	
 	public Tile getTileObj(int x, int y)

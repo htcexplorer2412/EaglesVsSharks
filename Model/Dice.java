@@ -34,13 +34,10 @@ public class Dice implements Subject{
 		return single_instance;
 	}
 	
-	@Override
 	public boolean getDiceRolled() {
-		// TODO Auto-generated method stub
 		return this.diceRolled;
 	}
 	
-	@Override
 	public boolean getTurn()
 	{
 		return this.turn;
@@ -53,7 +50,6 @@ public class Dice implements Subject{
 		notifyObservers();
 	}
 	
-	@Override
 	public int getDiceVal()
 	{
 		return diceVal;
