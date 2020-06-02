@@ -1,5 +1,14 @@
 package Model.PrototypeTileFactory;
 
+/**
+ * <H1>West Bordered Tile</H1>
+ * <p>
+ * A Tile with its west side blocked
+ * 
+ * @author Ayam Ajmera
+ * @version 1.0
+ * @since 2020-05-03
+ */
 public class WBorderedTile extends borderedTile {
 
 	/**
@@ -7,11 +16,23 @@ public class WBorderedTile extends borderedTile {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Calls the constructor of super class and passes the west side as blocked.
+	 * 
+	 * @since 1.0
+	 */
 	public WBorderedTile() 
 	{
 		super(true, true, true, false);
 	}
 
+	/**
+	 * Overrides the goWest method of the parent class. Set to return false every time because the Tile is bordered at the west side.
+	 * 
+	 * @return FALSE every time
+	 * @version 1.0
+	 * @since 1.0
+	 */
 	@Override
 	public boolean goWest() 
 	{
